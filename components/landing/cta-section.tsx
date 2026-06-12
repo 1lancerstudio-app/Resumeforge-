@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -64,16 +65,20 @@ export function CtaSection() {
                   <Button
                     size="lg"
                     className="bg-foreground hover:bg-foreground/90 text-background px-8 h-14 text-base rounded-full group"
+                    asChild
                   >
-                    Build My Resume
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    <Link href="/signup">
+                      Build My Resume
+                      <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    </Link>
                   </Button>
                   <Button
                     size="lg"
                     variant="outline"
                     className="h-14 px-8 text-base rounded-full border-foreground/20 hover:bg-foreground/5"
+                    asChild
                   >
-                    Verify a Resume
+                    <Link href="/signup?role=recruiter">Verify a Resume</Link>
                   </Button>
                 </div>
 

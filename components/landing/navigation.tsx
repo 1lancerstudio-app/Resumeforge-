@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
@@ -45,10 +46,10 @@ export function Navigation() {
           }`}
         >
           {/* Logo */}
-          <a href="#" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group">
             <span className={`font-display tracking-tight transition-all duration-500 ${isScrolled ? "text-xl text-foreground" : "text-2xl text-white"}`}>RESUMEFORGE</span>
             <span className={`font-mono transition-all duration-500 ${isScrolled ? "text-[9px] mt-0.5 text-muted-foreground" : "text-[10px] mt-1 text-white/60"}`}>AI</span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-12">
@@ -66,14 +67,15 @@ export function Navigation() {
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
-            <a href="#" className={`transition-all duration-500 ${isScrolled ? "text-xs text-foreground/70 hover:text-foreground" : "text-sm text-white/70 hover:text-white"}`}>
+            <Link href="/login" className={`transition-all duration-500 ${isScrolled ? "text-xs text-foreground/70 hover:text-foreground" : "text-sm text-white/70 hover:text-white"}`}>
               Sign in
-            </a>
+            </Link>
             <Button
               size="sm"
               className={`rounded-full transition-all duration-500 ${isScrolled ? "bg-foreground hover:bg-foreground/90 text-background px-4 h-8 text-xs" : "bg-white hover:bg-white/90 text-black px-6"}`}
+              asChild
             >
-              Build My Resume
+              <Link href="/signup">Build My Resume</Link>
             </Button>
           </div>
 
@@ -134,14 +136,16 @@ export function Navigation() {
               variant="outline" 
               className="flex-1 rounded-full h-14 text-base"
               onClick={() => setIsMobileMenuOpen(false)}
+              asChild
             >
-              Sign in
+              <Link href="/login">Sign in</Link>
             </Button>
             <Button 
               className="flex-1 bg-foreground text-background rounded-full h-14 text-base"
               onClick={() => setIsMobileMenuOpen(false)}
+              asChild
             >
-              Build My Resume
+              <Link href="/signup">Build My Resume</Link>
             </Button>
           </div>
         </div>
