@@ -5,32 +5,32 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "Our agents handle 80% of our customer support tickets autonomously. The ROI was immediate.",
-    author: "Sarah Chen",
-    role: "CTO",
-    company: "Meridian Labs",
-    metric: { value: "80%", label: "Ticket resolution" },
+    quote: "I applied to 12 companies in a week. Got callbacks from 8. ResumeForge AI nailed the tailoring for every single role.",
+    author: "Priya Sharma",
+    role: "Software Engineer",
+    company: "Landed at Stripe",
+    metric: { value: "8/12", label: "Callback rate" },
   },
   {
-    quote: "We deployed research agents that work 24/7. They surface insights we'd never find manually.",
-    author: "Marcus Webb",
-    role: "Head of Research",
-    company: "Flux Systems",
-    metric: { value: "10x", label: "Research output" },
+    quote: "As a recruiter I was skeptical. Then I scanned the QR, saw 12 verified claims in 2 seconds, and moved the candidate straight to a phone screen.",
+    author: "Tom Kiernan",
+    role: "Senior Recruiter",
+    company: "TechHire Partners",
+    metric: { value: "2sec", label: "Verification time" },
   },
   {
-    quote: "The multi-agent orchestration is incredible. Complex workflows that took weeks now run in hours.",
-    author: "Elena Rodriguez",
-    role: "VP Engineering",
-    company: "Beacon AI",
-    metric: { value: "40x", label: "Faster workflows" },
+    quote: "The Achievement Agent found three GitHub projects I'd completely forgotten about. They ended up being the thing that got me the interview.",
+    author: "Marcus Osei",
+    role: "ML Engineer",
+    company: "Landed at Cohere",
+    metric: { value: "3", label: "Hidden achievements found" },
   },
   {
-    quote: "Security was our biggest concern. The sandboxing and audit trails gave us full confidence.",
-    author: "James Liu",
-    role: "CISO",
-    company: "Prism Analytics",
-    metric: { value: "0", label: "Security incidents" },
+    quote: "My team now requires ResumeForge verification for every technical hire. It's cut our background check cost by 60% and saved hours per candidate.",
+    author: "Lena Vasquez",
+    role: "VP of Engineering",
+    company: "Proxima Systems",
+    metric: { value: "60%", label: "BGC cost reduction" },
   },
 ];
 
@@ -99,8 +99,8 @@ export function TestimonialsSection() {
             <h2 className={`text-4xl lg:text-5xl font-display transition-all duration-1000 ${
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}>
-              Trusted by teams
-              <span className="text-background/40"> worldwide.</span>
+              Real results,
+              <span className="text-background/40"> real people.</span>
             </h2>
           </div>
           
@@ -191,7 +191,7 @@ export function TestimonialsSection() {
             {/* Company list */}
             <div className="mt-4 pt-6 border-t border-background/10">
               <span className="text-xs font-mono text-background/30 uppercase tracking-widest block mb-4">
-                Featured companies
+                Featured voices
               </span>
               <div className="flex flex-wrap gap-3">
                 {testimonials.map((t, idx) => (

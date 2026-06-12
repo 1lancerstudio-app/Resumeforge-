@@ -21,8 +21,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'COMPUTE - AI Agents for Distributed Computing',
-  description: 'Deploy autonomous AI agents on distributed infrastructure. Offload complex tasks to intelligent workers that run 24/7.',
+  title: 'ResumeForge AI — Build & Verify Your Resume with AI Agents',
+  description: 'Six specialized AI agents craft, tailor, and cryptographically verify your resume in under 2 minutes. Land more callbacks. Built at Youth Code x AI Hackathon 2026.',
   generator: 'v0.app',
 }
 

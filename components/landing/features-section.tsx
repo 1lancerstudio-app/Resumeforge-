@@ -5,28 +5,37 @@ import { useEffect, useRef, useState } from "react";
 const features = [
   {
     number: "01",
-    title: "Autonomous Execution",
-    description: "Deploy AI agents that work independently. They analyze, decide, and execute complex multi-step tasks without human intervention.",
-    stats: { value: "99.7%", label: "task completion" },
+    title: "HR Agent",
+    description: "Scans job descriptions for ATS keywords and requirement signals. Ensures your resume passes automated screening before a human ever sees it.",
+    stats: { value: "97%", label: "ATS pass rate" },
   },
   {
     number: "02",
-    title: "Distributed Computing",
-    description: "Offload compute-heavy tasks to our global network. Your agents run on optimized infrastructure across 50+ regions worldwide.",
-    stats: { value: "50+", label: "global regions" },
+    title: "Tailoring Agent",
+    description: "Rewrites your bullet points to mirror the language and priorities of each specific role. No generic templates — every word earns its place.",
+    stats: { value: "3x", label: "relevance boost" },
   },
   {
     number: "03",
-    title: "Multi-Agent Orchestration",
-    description: "Coordinate teams of specialized agents. They communicate, delegate, and collaborate to solve complex problems together.",
-    stats: { value: "1000x", label: "parallel execution" },
+    title: "Achievement Agent",
+    description: "Pulls from your GitHub, certificates, side projects, and course completions to surface accomplishments you might have forgotten to include.",
+    stats: { value: "40+", label: "data sources" },
   },
   {
     number: "04",
-    title: "Secure Sandboxing",
-    description: "Each agent runs in isolated environments. Full audit trails, encrypted execution, and zero data leakage between tasks.",
-    stats: { value: "0", label: "data breaches" },
+    title: "Verification Agent",
+    description: "Generates a cryptographic proof for each claim on your resume, backed by primary sources. Produces a scannable QR code recruiters can check in seconds.",
+    stats: { value: "0", label: "false claims" },
   },
+];
+
+const agentRoster = [
+  { name: "HR Agent",           desc: "ATS keyword extraction" },
+  { name: "Tailoring Agent",    desc: "Bullet rewriter" },
+  { name: "Achievement Agent",  desc: "Data aggregator" },
+  { name: "Tone Agent",         desc: "Voice consistency" },
+  { name: "Verification Agent", desc: "Cryptographic proof" },
+  { name: "ATS Optimizer",      desc: "Score maximiser" },
 ];
 
 // Floating dot particles visualization
@@ -60,7 +69,6 @@ function ParticleVisualization() {
     };
     canvas.addEventListener("mousemove", handleMouseMove);
 
-    // Generate stable particle positions
     const COUNT = 70;
     const particles = Array.from({ length: COUNT }, (_, i) => {
       const seed = i * 1.618;
@@ -147,79 +155,85 @@ export function FeaturesSection() {
 
   return (
     <section
-      id="features"
+      id="agents"
       ref={sectionRef}
       className="relative py-24 lg:py-32 overflow-hidden"
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        {/* Header - Full width with diagonal layout */}
+        {/* Header */}
         <div className="relative mb-24 lg:mb-32">
           <div className="grid lg:grid-cols-12 gap-8 items-end">
             <div className="lg:col-span-7">
               <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
                 <span className="w-12 h-px bg-foreground/30" />
-                Capabilities
+                HOW THE AGENTS WORK
               </span>
               <h2
                 className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.9] transition-all duration-1000 ${
                   isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
               >
-                Intelligent
+                Six agents.
                 <br />
-                <span className="text-muted-foreground">workers.</span>
+                <span className="text-muted-foreground">One resume.</span>
               </h2>
             </div>
             <div className="lg:col-span-5 lg:pb-4">
               <p className={`text-xl text-muted-foreground leading-relaxed transition-all duration-1000 delay-200 ${
                 isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}>
-                Deploy autonomous AI agents that execute complex tasks across distributed infrastructure. No supervision required.
+                Each agent handles a distinct layer of your resume — from ATS parsing to cryptographic verification. They run in parallel so you get the final result in under two minutes.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Bento Grid Layout */}
-        <div className="grid lg:grid-cols-12 gap-4 lg:gap-6">
-          {/* Large feature card */}
-          <div 
-            className={`lg:col-span-12 relative bg-black border border-foreground/10 min-h-[500px] overflow-hidden group transition-all duration-700 flex ${
-              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
-            }`}
-            onMouseEnter={() => setActiveFeature(0)}
-          >
-            {/* Left: text content */}
-            <div className="relative flex-1 p-8 lg:p-12 bg-black">
-              <ParticleVisualization />
+        {/* Agent cards grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 mb-8">
+          {features.map((feature, index) => (
+            <div
+              key={feature.number}
+              className={`relative bg-black border border-foreground/10 overflow-hidden group transition-all duration-700 flex flex-col p-8 lg:p-12 ${
+                isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+              }`}
+              style={{ transitionDelay: `${index * 80}ms` }}
+              onMouseEnter={() => setActiveFeature(index)}
+            >
+              {index === 0 && (
+                <div className="absolute inset-0">
+                  <ParticleVisualization />
+                </div>
+              )}
               <div className="relative z-10">
-                <span className="font-mono text-sm text-muted-foreground">{features[0].number}</span>
-                <h3 className="text-3xl lg:text-4xl font-display mt-4 mb-6 group-hover:translate-x-2 transition-transform duration-500">
-                  {features[0].title}
+                <span className="font-mono text-sm text-muted-foreground">{feature.number}</span>
+                <h3 className="text-2xl lg:text-3xl font-display mt-4 mb-4 group-hover:translate-x-2 transition-transform duration-500">
+                  {feature.title}
                 </h3>
-                <p className="text-lg text-muted-foreground leading-relaxed max-w-md mb-8">
-                  {features[0].description}
+                <p className="text-base text-muted-foreground leading-relaxed mb-8">
+                  {feature.description}
                 </p>
                 <div>
-                  <span className="text-5xl lg:text-6xl font-display">{features[0].stats.value}</span>
-                  <span className="block text-sm text-muted-foreground font-mono mt-2">{features[0].stats.label}</span>
+                  <span className="text-4xl lg:text-5xl font-display">{feature.stats.value}</span>
+                  <span className="block text-sm text-muted-foreground font-mono mt-2">{feature.stats.label}</span>
                 </div>
               </div>
             </div>
+          ))}
+        </div>
 
-            {/* Right: mirrored image, full height */}
-            <div className="hidden lg:block relative w-[42%] shrink-0 overflow-hidden">
-              <img
-                src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Upscaled%20Image%20%2812%29-ng3RrNnsPMJ5CrtOjcPTmhHg01W11q.png"
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 w-full h-full object-cover object-center"
-                style={{ transform: "scaleX(-1)" }}
-              />
-              {/* Fade left edge into black */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent" />
+        {/* Agent Roster strip */}
+        <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px border border-foreground/10 transition-all duration-700 delay-300 ${
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        }`}>
+          {agentRoster.map((agent) => (
+            <div
+              key={agent.name}
+              className="p-4 lg:p-6 border-foreground/10 bg-foreground/[0.02] hover:bg-foreground/[0.05] transition-colors"
+            >
+              <span className="block font-mono text-xs text-[#eca8d6] mb-1 truncate">{agent.name}</span>
+              <span className="block text-xs text-muted-foreground leading-tight">{agent.desc}</span>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>

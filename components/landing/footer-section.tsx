@@ -5,27 +5,22 @@ import { useEffect, useRef } from "react";
 
 const footerLinks = {
   Product: [
-    { name: "Agent capabilities", href: "#features" },
-    { name: "How it works", href: "#how-it-works" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Integrations", href: "#integrations" },
+    { name: "How It Works",   href: "#how-it-works"  },
+    { name: "AI Agents",      href: "#agents"        },
+    { name: "Achievements",   href: "#achievements"  },
+    { name: "Verify",         href: "#verify"        },
+    { name: "Pricing",        href: "#pricing"       },
   ],
-  Developers: [
-    { name: "Documentation", href: "#developers" },
-    { name: "Agent SDK", href: "#" },
-    { name: "API Reference", href: "#developers" },
-    { name: "Status", href: "#" },
+  Recruiters: [
+    { name: "Verification API", href: "#developers" },
+    { name: "Bulk Verify",      href: "#developers" },
+    { name: "Documentation",    href: "#"           },
+    { name: "Status",           href: "#"           },
   ],
   Company: [
-    { name: "About", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "Careers", href: "#", badge: "Hiring" },
-    { name: "Contact", href: "#" },
-  ],
-  Legal: [
-    { name: "Privacy", href: "#" },
-    { name: "Terms", href: "#" },
-    { name: "Security", href: "#security" },
+    { name: "About",    href: "#" },
+    { name: "GitHub",   href: "#" },
+    { name: "Privacy",  href: "#" },
   ],
 };
 
@@ -115,12 +110,12 @@ export function FooterSection() {
             {/* Brand Column */}
             <div className="col-span-2">
               <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display text-white">COMPUTE</span>
-                <span className="text-xs text-white/40 font-mono">TM</span>
+                <span className="text-2xl font-display text-white">RESUMEFORGE</span>
+                <span className="text-[10px] text-white/40 font-mono">AI</span>
               </a>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">
-                Autonomous AI agents for distributed computing. Delegate complex tasks to intelligent workers.
+                AI-powered resume builder with cryptographic verification. Built at Youth Code x AI Hackathon 2026.
               </p>
 
               {/* Social Links */}
@@ -167,7 +162,7 @@ export function FooterSection() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/30">
-            &copy; 2025 COMPUTE. All rights reserved.
+            &copy; 2026 ResumeForge AI. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-white/30">

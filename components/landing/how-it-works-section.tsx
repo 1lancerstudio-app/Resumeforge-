@@ -5,39 +5,40 @@ import { useEffect, useRef, useState } from "react";
 const steps = [
   {
     number: "01",
-    title: "Define",
-    subtitle: "your agent",
-    description: "Describe what your agent should do. Set its capabilities, constraints, and goals in natural language or code.",
-    code: `const researcher = new Agent({
-  role: 'Research Analyst',
-  capabilities: ['web', 'docs', 'api'],
-  memory: true,
-  autonomy: 'full'
+    title: "Upload",
+    subtitle: "your profile",
+    description: "Paste your LinkedIn URL or upload a PDF. Our agents extract your experience, skills, and achievements automatically.",
+    code: `profile.ingest({
+  source: "linkedin",
+  url: "linkedin.com/in/you",
+  enrich: ["github", "credly"],
+  achievements: true,
 })`,
   },
   {
     number: "02",
-    title: "Assign",
-    subtitle: "the task",
-    description: "Give your agent a mission. It breaks down complex tasks into steps and executes them autonomously.",
-    code: `await researcher.execute({
-  task: 'Analyze competitor pricing',
-  sources: ['public-data', 'news'],
-  output: 'structured-report',
-  deadline: '2h'
+    title: "Paste",
+    subtitle: "the job link",
+    description: "Drop in a job posting URL. The HR and Tailoring agents analyze the role, extract keywords, and score your fit in seconds.",
+    code: `agents.analyze({
+  job: "greenhouse.io/apply/...",
+  agents: ["hr", "tailoring", "tone"],
+  ats_score: true,
+  output: "diff",
 })`,
   },
   {
     number: "03",
-    title: "Monitor",
-    subtitle: "& scale",
-    description: "Track progress in real-time. Spin up more agents as needed. Pay only for compute used.",
-    code: `optimus.dashboard({
-  agents: [researcher],
-  metrics: ['tasks', 'latency', 'cost'],
-  alerts: true
-})
-// 847 tasks completed today`,
+    title: "Download",
+    subtitle: "& verify",
+    description: "Get a perfectly tailored PDF with a live verification QR code. Share the link — recruiters can check every claim in under 3 seconds.",
+    code: `forge.generate({
+  format: "pdf",
+  verify: true,
+  qr_claims: 12,
+  link: "resumeforge.ai/v/RF-2026",
+  // Ready to send
+})`,
   },
 ];
 
@@ -81,16 +82,16 @@ export function HowItWorksSection() {
             <div className={`transition-all duration-1000 ${isVisible ? "translate-x-0 opacity-100" : "-translate-x-12 opacity-0"}`}>
               <span className="inline-flex items-center gap-3 text-sm font-mono text-white/40 mb-8">
                 <span className="w-12 h-px bg-white/20" />
-                Process
+                How It Works
               </span>
             </div>
             
             <h2 className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.85] transition-all duration-1000 delay-100 ${
               isVisible ? "translate-y-0 opacity-100" : "translate-y-16 opacity-0"
             }`}>
-              <span className="block">Define.</span>
-              <span className="block text-white/30">Deploy.</span>
-              <span className="block text-white/10">Scale.</span>
+              <span className="block">Upload.</span>
+              <span className="block text-white/30">Paste.</span>
+              <span className="block text-white/10">Download.</span>
             </h2>
           </div>
 
@@ -145,11 +146,20 @@ export function HowItWorksSection() {
               </span>
 
               {/* Description */}
-              <p className={`text-white/60 leading-relaxed transition-opacity duration-300 ${
+              <p className={`text-white/60 leading-relaxed transition-opacity duration-300 mb-6 ${
                 activeStep === index ? "opacity-100" : "opacity-60"
               }`}>
                 {step.description}
               </p>
+
+              {/* Inline code block */}
+              <div className={`rounded-none border border-white/10 bg-black/60 overflow-x-auto transition-all duration-500 ${
+                activeStep === index ? "opacity-100" : "opacity-40"
+              }`}>
+                <pre className="p-4 text-[11px] font-mono text-white/60 leading-relaxed whitespace-pre">
+                  <code>{step.code}</code>
+                </pre>
+              </div>
 
               {/* Active indicator */}
               <div className={`absolute bottom-0 left-0 right-0 h-1 bg-[#eca8d6] transition-transform duration-500 origin-left ${
