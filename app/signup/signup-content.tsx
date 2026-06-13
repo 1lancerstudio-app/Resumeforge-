@@ -150,7 +150,7 @@ export function SignupContent() {
     if (role === "recruiter") {
       router.push("/recruiter");
     } else {
-      router.push("/dashboard");
+      router.push("/onboarding");
     }
   }
 
