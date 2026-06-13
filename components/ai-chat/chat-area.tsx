@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 
-export function ChatArea() {
+export function ChatArea({ theme = "dark" }: { theme?: "light" | "dark" }) {
   const [isRecording, setIsRecording] = useState(false)
   const [modelDropdownOpen, setModelDropdownOpen] = useState(false)
   const [configDropdownOpen, setConfigDropdownOpen] = useState(false)
@@ -24,28 +24,38 @@ export function ChatArea() {
 
   return (
     <main className="flex-1 flex flex-col relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
+      {theme === "dark" ? (
+        <>
+          <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-950 to-black" />
 
-      {/* Animated gradient orbs for shader effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="shader-orb shader-orb-1" />
-        <div className="shader-orb shader-orb-2" />
-        <div className="shader-orb shader-orb-3" />
-      </div>
+          {/* Animated gradient orbs for shader effect */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="shader-orb shader-orb-1" />
+            <div className="shader-orb shader-orb-2" />
+            <div className="shader-orb shader-orb-3" />
+          </div>
 
-      {/* Animated grid overlay */}
-      <div className="absolute inset-0 opacity-[0.15] grid-background" />
+          {/* Animated grid overlay */}
+          <div className="absolute inset-0 opacity-[0.15] grid-background" />
 
-      {/* Noise texture for depth */}
-      <div
-        className="absolute inset-0 opacity-[0.03] mix-blend-soft-light pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-        }}
-      />
+          {/* Noise texture for depth */}
+          <div
+            className="absolute inset-0 opacity-[0.03] mix-blend-soft-light pointer-events-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+            }}
+          />
+        </>
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-100" />
+      )}
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 backdrop-blur-sm bg-background/30">
+      <header className={`relative z-10 flex items-center justify-between px-6 py-4 backdrop-blur-sm ${
+        theme === "light" 
+          ? "bg-white/80 border-b border-gray-200" 
+          : "bg-background/30"
+      }`}>
         <div className="relative">
           <Button
             className="btn-3d btn-glow gap-2 bg-gradient-to-br from-secondary/90 to-secondary/70 text-foreground hover:from-secondary/70 hover:to-secondary/50 backdrop-blur-sm border border-border/30 shadow-lg"

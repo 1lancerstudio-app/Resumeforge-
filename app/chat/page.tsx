@@ -1,23 +1,45 @@
 "use client"
 
-import { Suspense, useState } from "react"
+import { Suspense, useState, useEffect } from "react"
 import { ChatArea } from "@/components/ai-chat/chat-area"
 import { Sidebar } from "@/components/ai-chat/sidebar"
 import { Navigation } from "@/components/landing/navigation"
-import { useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { Moon, Sun } from "lucide-react"
 
 function ChatContent() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [theme, setTheme] = useState<"light" | "dark">("dark")
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+    const savedTheme = localStorage.getItem("chat-theme") as "light" | "dark" | null
+    if (savedTheme) {
+      setTheme(savedTheme)
+      document.documentElement.setAttribute("data-chat-theme", savedTheme)
+    }
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = theme === "dark" ? "light" : "dark"
+    setTheme(newTheme)
+    localStorage.setItem("chat-theme", newTheme)
+    document.documentElement.setAttribute("data-chat-theme", newTheme)
+  }
+
+  if (!mounted) return null
 
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground">
+    <div className={`flex flex-col h-screen ${theme === "light" ? "bg-white text-gray-900" : "bg-background text-foreground"}`} data-chat-theme={theme}>
       <Navigation isChat={true} />
       <div className="flex flex-1 relative overflow-hidden">
         {/* Sidebar Toggle Button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="absolute left-4 top-4 z-50 p-2 rounded-lg hover:bg-secondary/50 transition-colors md:hidden"
+          className={`absolute left-4 top-4 z-50 p-2 rounded-lg transition-colors md:hidden ${
+            theme === "light" ? "hover:bg-gray-200" : "hover:bg-secondary/50"
+          }`}
           aria-label="Toggle sidebar"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -25,9 +47,27 @@ function ChatContent() {
           </svg>
         </button>
 
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className={`absolute right-4 top-4 z-50 p-2 rounded-lg transition-colors md:relative md:right-auto md:top-auto md:absolute md:right-4 md:top-4 ${
+            theme === "light" 
+              ? "bg-gray-100 text-gray-800 hover:bg-gray-200" 
+              : "hover:bg-secondary/50"
+          }`}
+          aria-label="Toggle theme"
+          title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+        >
+          {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+        </button>
+
         {/* Sidebar with responsive behavior */}
         <div
-          className={`absolute md:relative w-80 h-full bg-sidebar transform transition-transform duration-300 ease-in-out z-40 ${
+          className={`absolute md:relative w-80 h-full ${
+            theme === "light" 
+              ? "bg-gray-50 border-r border-gray-200" 
+              : "bg-sidebar"
+          } transform transition-transform duration-300 ease-in-out z-40 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }`}
         >
@@ -37,13 +77,13 @@ function ChatContent() {
         {/* Overlay for mobile when sidebar is open */}
         {sidebarOpen && (
           <div
-            className="absolute inset-0 bg-black/50 md:hidden z-30"
+            className={`absolute inset-0 md:hidden z-30 ${theme === "light" ? "bg-gray-900/50" : "bg-black/50"}`}
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
         {/* Chat Area */}
-        <ChatArea />
+        <ChatArea theme={theme} />
       </div>
     </div>
   )
