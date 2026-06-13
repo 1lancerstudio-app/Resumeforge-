@@ -3,14 +3,18 @@
 import { Suspense } from "react"
 import { ChatArea } from "@/components/ai-chat/chat-area"
 import { Sidebar } from "@/components/ai-chat/sidebar"
+import { Navigation } from "@/components/landing/navigation"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 function ChatContent() {
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      <Sidebar />
-      <ChatArea />
+    <div className="flex flex-col h-screen bg-background text-foreground">
+      <Navigation />
+      <div className="flex flex-1">
+        <Sidebar />
+        <ChatArea />
+      </div>
     </div>
   )
 }
