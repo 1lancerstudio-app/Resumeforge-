@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import Link from "next/link";
+import { saveAnswers } from "@/lib/devpulse-data";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -323,6 +324,12 @@ export default function OnboardingPage() {
   function goNext() {
     if (!hasAnswer) return;
     if (step === TOTAL - 1) {
+      // Persist the full answer object so DevPulse can build the skill radar
+      const finalAnswers = { ...answers, [step]: currentAnswer };
+      saveAnswers(finalAnswers);
+      if (typeof window !== "undefined") {
+        console.log("[v0] onboarding answers collected:", finalAnswers);
+      }
       setDone(true);
       return;
     }
@@ -480,15 +487,25 @@ export default function OnboardingPage() {
       {/* Footer nav */}
       {!done && (
         <footer className="flex items-center justify-between px-6 sm:px-10 pb-10">
-          <button
-            onClick={goBack}
-            disabled={step === 0}
-            className="flex items-center gap-2 font-mono text-sm transition-opacity duration-150 disabled:opacity-20 disabled:cursor-not-allowed hover:opacity-70"
-            style={{ color: "rgba(255,255,255,0.55)" }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back
-          </button>
+          {step === 0 ? (
+            <Link
+              href="/"
+              className="flex items-center gap-2 font-mono text-sm transition-opacity duration-300 ease-in-out hover:opacity-70"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Exit
+            </Link>
+          ) : (
+            <button
+              onClick={goBack}
+              className="flex items-center gap-2 font-mono text-sm transition-opacity duration-300 ease-in-out hover:opacity-70"
+              style={{ color: "rgba(255,255,255,0.55)" }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </button>
+          )}
 
           <AnimatePresence>
             {hasAnswer && (

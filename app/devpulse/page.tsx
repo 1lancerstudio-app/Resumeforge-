@@ -7,52 +7,41 @@ import {
   Radar,
   PolarGrid,
   PolarAngleAxis,
+  PolarRadiusAxis,
   ResponsiveContainer,
 } from "recharts";
 import { ArrowRight, CheckCircle2, AlertTriangle, Zap, BookOpen, MessageSquare } from "lucide-react";
+import Link from "next/link";
+import {
+  AXES,
+  COMPANY_SCORES,
+  loadAnswers,
+  computeCandidateScores,
+  computeMatchPct,
+  computeStrengths,
+  computeGaps,
+  type Insight,
+} from "@/lib/devpulse-data";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
-const AXES = [
-  "Technical Skill Depth",
-  "System Design Thinking",
-  "Communication & Docs",
-  "Collaboration & Team Fit",
-  "Problem-Solving Speed",
-  "Domain Knowledge",
-];
+// Recommended next steps mapped from the user's top gaps.
+const ACTION_ICONS = [Zap, BookOpen, MessageSquare];
 
-const COMPANY_SCORES  = [4, 3, 4, 3, 5, 4];
-const CANDIDATE_SCORES = [3.2, 2.5, 3.8, 3.5, 4.8, 3.0];
-
-const companyData  = AXES.map((axis, i) => ({ axis, value: COMPANY_SCORES[i],  fullMark: 5 }));
-const candidateData = AXES.map((axis, i) => ({ axis, value: CANDIDATE_SCORES[i], fullMark: 5 }));
-const combinedData  = AXES.map((axis, i) => ({
-  axis,
-  company:   COMPANY_SCORES[i],
-  candidate: CANDIDATE_SCORES[i],
-  fullMark: 5,
-}));
-
-const MATCH_PCT = 74;
-
-const STRENGTHS = [
-  { axis: "Problem-Solving Speed",  insight: "Above required threshold by 0.8 points" },
-  { axis: "Communication & Docs",   insight: "Meets requirement; documentation trail verified" },
-  { axis: "Collaboration & Fit",    insight: "Activity score places you in top 20% of candidates" },
-];
-
-const GAPS = [
-  { axis: "System Design Thinking",   fix: "Contribute to architecture discussions or publish system-design posts" },
-  { axis: "Technical Skill Depth",    fix: "Add 1–2 advanced projects demonstrating depth in your primary stack" },
-  { axis: "Domain Knowledge",         fix: "Complete 2 domain-specific courses and link credentials to your profile" },
-];
-
-const ACTIONS = [
-  { num: "01", icon: Zap,             text: "Complete 2 open-source contributions tagged #system-design" },
-  { num: "02", icon: BookOpen,        text: "Add a technical blog post to your DevPulse profile this week" },
-  { num: "03", icon: MessageSquare,   text: "Engage in 5+ architecture-related discussions this week" },
-];
+function buildActions(gaps: Insight[]) {
+  const base = gaps.length
+    ? gaps.map((g) => `Improve ${g.axis}: ${g.detail}`)
+    : [
+        "Complete 2 open-source contributions tagged #system-design",
+        "Add a technical blog post to your DevPulse profile this week",
+        "Engage in 5+ architecture-related discussions this week",
+      ];
+  return base.slice(0, 3).map((text, i) => ({
+    num: String(i + 1).padStart(2, "0"),
+    icon: ACTION_ICONS[i % ACTION_ICONS.length],
+    text,
+  }));
+}
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -121,13 +110,13 @@ function MatchGauge({ pct }: { pct: number }) {
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className="text-4xl font-bold leading-none"
-          style={{ fontFamily: "'Inter', sans-serif", color: YELLOW, textShadow: `0 0 20px ${YELLOW}66` }}
+          style={{ fontFamily: "var(--font-sans)", color: YELLOW, textShadow: `0 0 20px ${YELLOW}66` }}
         >
           <AnimatedNumber to={pct} />%
         </span>
         <span
           className="text-xs mt-1"
-          style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em" }}
+          style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.4)", letterSpacing: "0.08em" }}
         >
           MATCH
         </span>
@@ -174,28 +163,38 @@ function RadarPanel({
   title,
   subtext,
   scores,
+  candidateScores,
   color,
 }: {
   mode: RadarMode;
   title: string;
   subtext: string;
   scores: number[];
+  candidateScores?: number[];
   color: string;
 }) {
-  const data = mode === "compare" ? combinedData : AXES.map((axis, i) => ({ axis, value: scores[i], fullMark: 5 }));
+  const data =
+    mode === "compare"
+      ? AXES.map((axis, i) => ({
+          axis,
+          company: COMPANY_SCORES[i],
+          candidate: (candidateScores ?? scores)[i],
+          fullMark: 5,
+        }))
+      : AXES.map((axis, i) => ({ axis, value: scores[i], fullMark: 5 }));
 
   return (
     <div className="flex flex-col gap-6 h-full" style={glassStyle({ borderRadius: 12, padding: "28px 24px" })}>
       <div>
         <p
           className="text-xs uppercase tracking-widest mb-1"
-          style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.35)" }}
+          style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.35)" }}
         >
           {subtext}
         </p>
         <h2
           className="text-lg font-semibold"
-          style={{ fontFamily: "'Inter', sans-serif", color: "#fff" }}
+          style={{ fontFamily: "var(--font-sans)", color: "#fff" }}
         >
           {title}
         </h2>
@@ -212,10 +211,16 @@ function RadarPanel({
             <PolarAngleAxis
               dataKey="axis"
               tick={{
-                fontFamily: "'Geist Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10,
                 fill: "rgba(255,255,255,0.55)",
               }}
+            />
+            <PolarRadiusAxis
+              domain={[0, 5]}
+              tick={false}
+              axisLine={false}
+              tickCount={6}
             />
             {mode === "compare" ? (
               <>
@@ -259,14 +264,14 @@ function RadarPanel({
           <div key={axis} className="flex items-center justify-between">
             <span
               className="text-xs truncate pr-2"
-              style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.45)" }}
+              style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.45)" }}
             >
               {axis}
             </span>
             <span
               className="text-xs px-2 py-0.5 shrink-0"
               style={{
-                fontFamily: "'Geist Mono', monospace",
+                fontFamily: "var(--font-mono)",
                 color,
                 border: `1px solid ${color}44`,
                 borderRadius: 4,
@@ -283,21 +288,87 @@ function RadarPanel({
   );
 }
 
+// ─── Empty state (no onboarding data) ───────────────────────────────────────────
+
+function EmptyState() {
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center px-6"
+      style={{ backgroundColor: BG, fontFamily: "var(--font-sans)", color: "#fff" }}
+    >
+      <div
+        className="flex flex-col items-center gap-6 text-center max-w-md"
+        style={glassStyle({ borderRadius: 12, padding: "48px 36px" })}
+      >
+        <span
+          className="text-xs uppercase tracking-widest"
+          style={{ fontFamily: "var(--font-mono)", color: GREEN, letterSpacing: "0.14em" }}
+        >
+          Xrivu.01 · No Profile Found
+        </span>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-sans)" }}>
+          Complete onboarding to build your skill radar
+        </h1>
+        <p className="text-sm" style={{ fontFamily: "var(--font-sans)", color: "rgba(255,255,255,0.45)" }}>
+          We need a few answers about your experience before we can generate your DevPulse match analysis.
+        </p>
+        <Link
+          href="/onboarding"
+          className="inline-flex items-center gap-2 px-7 py-3 text-sm font-semibold transition-all duration-300 ease-in-out hover:brightness-110"
+          style={{ fontFamily: "var(--font-sans)", background: YELLOW, color: BG, borderRadius: 12, boxShadow: `0 0 20px ${YELLOW}40` }}
+        >
+          Start Onboarding
+          <ArrowRight size={16} />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function JobMatchPage() {
   const [compareMode, setCompareMode] = useState(false);
+  const [hydrated, setHydrated] = useState(false);
+  const [candidateScores, setCandidateScores] = useState<number[] | null>(null);
   const analysisRef  = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setCandidateScores(computeCandidateScores(loadAnswers()));
+    setHydrated(true);
+  }, []);
 
   const fadeUp = {
     hidden: { opacity: 0, y: 24 },
-    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" } }),
+    visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" as const } }),
   };
+
+  // Wait for client hydration before deciding what to render (avoids 0% flash)
+  if (!hydrated) {
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: BG, fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.4)" }}
+      >
+        <span className="text-xs uppercase tracking-widest">Loading skill radar…</span>
+      </div>
+    );
+  }
+
+  // No onboarding answers → guide the user back to onboarding
+  if (!candidateScores) {
+    return <EmptyState />;
+  }
+
+  const matchPct = computeMatchPct(candidateScores);
+  const strengths = computeStrengths(candidateScores);
+  const gaps = computeGaps(candidateScores);
+  const actions = buildActions(gaps);
 
   return (
     <div
       className="min-h-screen"
-      style={{ backgroundColor: BG, fontFamily: "'Inter', sans-serif", color: "#fff" }}
+      style={{ backgroundColor: BG, fontFamily: "var(--font-sans)", color: "#fff" }}
     >
       {/* ── Top bar ── */}
       <header
@@ -307,14 +378,14 @@ export default function JobMatchPage() {
         <div className="flex items-center gap-3">
           <span
             className="text-sm font-semibold tracking-tight"
-            style={{ fontFamily: "'Geist Mono', monospace", color: "#fff" }}
+            style={{ fontFamily: "var(--font-mono)", color: "#fff" }}
           >
             DevPulse
           </span>
           <span style={{ color: GLASS_BORDER }}>·</span>
           <span
             className="text-xs"
-            style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.35)" }}
+            style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.35)" }}
           >
             Job Match Analysis
           </span>
@@ -326,7 +397,7 @@ export default function JobMatchPage() {
             onClick={() => setCompareMode((v) => !v)}
             className="flex items-center gap-2 px-3 py-1.5 text-xs transition-all duration-300"
             style={{
-              fontFamily: "'Geist Mono', monospace",
+              fontFamily: "var(--font-mono)",
               border: `1px solid ${compareMode ? GREEN : GLASS_BORDER}`,
               borderRadius: 8,
               color: compareMode ? GREEN : "rgba(255,255,255,0.4)",
@@ -353,7 +424,7 @@ export default function JobMatchPage() {
             />
             <span
               className="text-xs"
-              style={{ fontFamily: "'Geist Mono', monospace", color: GREEN, letterSpacing: "0.1em" }}
+              style={{ fontFamily: "var(--font-mono)", color: GREEN, letterSpacing: "0.1em" }}
             >
               XRIVU.01 ACTIVE
             </span>
@@ -372,13 +443,13 @@ export default function JobMatchPage() {
         >
           <p
             className="text-xs uppercase tracking-widest mb-2"
-            style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.3)" }}
+            style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.3)" }}
           >
             Powered by Xrivu.01
           </p>
           <h1
             className="text-3xl md:text-4xl font-bold leading-tight"
-            style={{ fontFamily: "'Inter', sans-serif" }}
+            style={{ fontFamily: "var(--font-sans)" }}
           >
             Job Match Analysis
           </h1>
@@ -394,7 +465,8 @@ export default function JobMatchPage() {
                 mode="compare"
                 title="Radar Comparison"
                 subtext="Company vs. Candidate overlay"
-                scores={CANDIDATE_SCORES}
+                scores={candidateScores}
+                candidateScores={candidateScores}
                 color={GREEN}
               />
             ) : (
@@ -415,8 +487,8 @@ export default function JobMatchPage() {
               <RadarPanel
                 mode="candidate"
                 title="Your Skill Radar"
-                subtext="Built from your profile, portfolio, and activity on DevPulse"
-                scores={CANDIDATE_SCORES}
+                subtext="Built from your onboarding answers and activity on DevPulse"
+                scores={candidateScores}
                 color={YELLOW}
               />
             </motion.div>
@@ -430,7 +502,7 @@ export default function JobMatchPage() {
             >
               <p
                 className="text-xs uppercase tracking-widest mb-4"
-                style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.35)" }}
+                style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.35)" }}
               >
                 Legend
               </p>
@@ -438,24 +510,24 @@ export default function JobMatchPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="w-3 h-3 rounded-full" style={{ background: GREEN, boxShadow: `0 0 8px ${GREEN}` }} />
-                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 11, color: GREEN }}>Company Requirements</span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: GREEN }}>Company Requirements</span>
                   </div>
                   {AXES.map((a, i) => (
                     <div key={a} className="flex justify-between items-center py-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{a}</span>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 10, color: GREEN }}>{COMPANY_SCORES[i]}/5</span>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{a}</span>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: GREEN }}>{COMPANY_SCORES[i]}/5</span>
                     </div>
                   ))}
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-3">
                     <span className="w-3 h-3 rounded-full" style={{ background: YELLOW, boxShadow: `0 0 8px ${YELLOW}` }} />
-                    <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 11, color: YELLOW }}>Your Scores</span>
+                    <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: YELLOW }}>Your Scores</span>
                   </div>
                   {AXES.map((a, i) => (
                     <div key={a} className="flex justify-between items-center py-1.5" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{a}</span>
-                      <span style={{ fontFamily: "'Geist Mono', monospace", fontSize: 10, color: YELLOW }}>{CANDIDATE_SCORES[i]}/5</span>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{a}</span>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: YELLOW }}>{candidateScores[i]}/5</span>
                     </div>
                   ))}
                 </div>
@@ -478,28 +550,28 @@ export default function JobMatchPage() {
             <div className="flex-1">
               <p
                 className="text-xs uppercase tracking-widest mb-3"
-                style={{ fontFamily: "'Geist Mono', monospace", color: GREEN, letterSpacing: "0.14em" }}
+                style={{ fontFamily: "var(--font-mono)", color: GREEN, letterSpacing: "0.14em" }}
               >
                 AI AGENT · XRIVU.01
               </p>
               <h2
                 className="text-2xl md:text-3xl font-bold mb-2"
-                style={{ fontFamily: "'Inter', sans-serif" }}
+                style={{ fontFamily: "var(--font-sans)" }}
               >
                 <Typewriter text="Match Probability Report" delay={200} />
               </h2>
               <p
                 className="text-sm"
-                style={{ fontFamily: "'Inter', sans-serif", color: "rgba(255,255,255,0.45)", maxWidth: 480 }}
+                style={{ fontFamily: "var(--font-sans)", color: "rgba(255,255,255,0.45)", maxWidth: 480 }}
               >
                 Based on cross-analysis of company requirements vs. your current skill radar
               </p>
             </div>
             <div className="flex flex-col items-center gap-2">
-              <MatchGauge pct={MATCH_PCT} />
+              <MatchGauge pct={matchPct} />
               <p
                 className="text-xs text-center"
-                style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.3)", maxWidth: 140 }}
+                style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.3)", maxWidth: 140 }}
               >
                 Cross-analysis complete
               </p>
@@ -512,12 +584,17 @@ export default function JobMatchPage() {
             <div>
               <p
                 className="text-xs uppercase tracking-widest mb-5"
-                style={{ fontFamily: "'Geist Mono', monospace", color: GREEN }}
+                style={{ fontFamily: "var(--font-mono)", color: GREEN }}
               >
                 Strengths Detected
               </p>
               <div className="flex flex-col gap-4">
-                {STRENGTHS.map(({ axis, insight }, i) => (
+                {strengths.length === 0 && (
+                  <p className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.35)" }}>
+                    No axes above requirement yet — focus on the gaps below.
+                  </p>
+                )}
+                {strengths.map(({ axis, detail }, i) => (
                   <motion.div
                     key={axis}
                     initial={{ opacity: 0, x: -16 }}
@@ -535,15 +612,15 @@ export default function JobMatchPage() {
                     <div>
                       <p
                         className="text-sm font-medium mb-0.5"
-                        style={{ fontFamily: "'Inter', sans-serif", color: "#fff" }}
+                        style={{ fontFamily: "var(--font-sans)", color: "#fff" }}
                       >
                         {axis}
                       </p>
                       <p
                         className="text-xs"
-                        style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.45)" }}
+                        style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.45)" }}
                       >
-                        {insight}
+                        {detail}
                       </p>
                     </div>
                   </motion.div>
@@ -555,12 +632,17 @@ export default function JobMatchPage() {
             <div>
               <p
                 className="text-xs uppercase tracking-widest mb-5"
-                style={{ fontFamily: "'Geist Mono', monospace", color: YELLOW }}
+                style={{ fontFamily: "var(--font-mono)", color: YELLOW }}
               >
                 Gaps to Close
               </p>
               <div className="flex flex-col gap-4">
-                {GAPS.map(({ axis, fix }, i) => (
+                {gaps.length === 0 && (
+                  <p className="text-xs" style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.35)" }}>
+                    No gaps detected — you meet or exceed every requirement.
+                  </p>
+                )}
+                {gaps.map(({ axis, detail }, i) => (
                   <motion.div
                     key={axis}
                     initial={{ opacity: 0, x: 16 }}
@@ -578,15 +660,15 @@ export default function JobMatchPage() {
                     <div>
                       <p
                         className="text-sm font-medium mb-0.5"
-                        style={{ fontFamily: "'Inter', sans-serif", color: "#fff" }}
+                        style={{ fontFamily: "var(--font-sans)", color: "#fff" }}
                       >
                         {axis}
                       </p>
                       <p
                         className="text-xs"
-                        style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.45)" }}
+                        style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.45)" }}
                       >
-                        {fix}
+                        {detail}
                       </p>
                     </div>
                   </motion.div>
@@ -611,12 +693,12 @@ export default function JobMatchPage() {
           >
             <p
               className="text-xs uppercase tracking-widest mb-6"
-              style={{ fontFamily: "'Geist Mono', monospace", color: "rgba(255,255,255,0.4)", letterSpacing: "0.12em" }}
+              style={{ fontFamily: "var(--font-mono)", color: "rgba(255,255,255,0.4)", letterSpacing: "0.12em" }}
             >
               Xrivu.01 Recommends
             </p>
             <div className="flex flex-col gap-4">
-              {ACTIONS.map(({ num, icon: Icon, text }, i) => (
+              {actions.map(({ num, icon: Icon, text }, i) => (
                 <motion.div
                   key={num}
                   initial={{ opacity: 0, y: 12 }}
@@ -640,13 +722,13 @@ export default function JobMatchPage() {
                   <div className="flex-1 flex items-center gap-3">
                     <span
                       className="text-xs shrink-0"
-                      style={{ fontFamily: "'Geist Mono', monospace", color: YELLOW, opacity: 0.7 }}
+                      style={{ fontFamily: "var(--font-mono)", color: YELLOW, opacity: 0.7 }}
                     >
                       {num}
                     </span>
                     <p
                       className="text-sm"
-                      style={{ fontFamily: "'Inter', sans-serif", color: "rgba(255,255,255,0.75)" }}
+                      style={{ fontFamily: "var(--font-sans)", color: "rgba(255,255,255,0.75)" }}
                     >
                       {text}
                     </p>
@@ -663,7 +745,7 @@ export default function JobMatchPage() {
               whileTap={{ scale: 0.97 }}
               className="flex items-center gap-2 px-7 py-3 text-sm font-semibold transition-all duration-300"
               style={{
-                fontFamily: "'Inter', sans-serif",
+                fontFamily: "var(--font-sans)",
                 background: YELLOW,
                 color: BG,
                 borderRadius: 8,
