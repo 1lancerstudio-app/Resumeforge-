@@ -75,7 +75,7 @@ export function Navigation() {
               className={`rounded-full transition-all duration-500 ${isScrolled ? "bg-foreground hover:bg-foreground/90 text-background px-4 h-8 text-xs" : "bg-white hover:bg-white/90 text-black px-6"}`}
               asChild
             >
-              <Link href="/signup">Build My Resume</Link>
+              <Link href="/resume-builder">Build My Resume</Link>
             </Button>
           </div>
 
