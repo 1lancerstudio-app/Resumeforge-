@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback, Suspense, lazy } from "react";
 import Link from "next/link";
-import { Send, Sparkles } from "lucide-react";
+import { Send, Sparkles, Mic, X, Check, ChevronDown } from "lucide-react";
+
+// Lazy-load the 3-D orb so Three.js doesn't block the initial paint
+const ParticleOrbChat = lazy(() =>
+  import("@/components/chat/particle-orb-chat").then((m) => ({ default: m.ParticleOrbChat }))
+);
 
 const features = [
   {
@@ -79,16 +84,34 @@ const AGENT_COLOR: Record<string, string> = {
   "ResumeForge AI":     "#c4b5fd",
 };
 
+const AGENTS = ["HR Agent", "Tailoring Agent", "Achievement Agent", "Verification Agent"];
+
 function TypingDots() {
   return (
-    <span className="inline-flex items-center gap-1 h-4">
+    <span className="inline-flex items-center gap-[3px] h-4">
       {[0, 1, 2].map((i) => (
         <span
           key={i}
-          className="w-1 h-1 rounded-full bg-white/40 animate-bounce"
-          style={{ animationDelay: `${i * 150}ms`, animationDuration: "900ms" }}
+          className="w-[5px] h-[5px] rounded-full bg-white/50 animate-bounce"
+          style={{ animationDelay: `${i * 140}ms`, animationDuration: "850ms" }}
         />
       ))}
+    </span>
+  );
+}
+
+function AgentPill({ name }: { name: string }) {
+  const color = AGENT_COLOR[name] ?? "#eca8d6";
+  return (
+    <span
+      className="agent-tag-pill"
+      style={{ color, borderColor: `${color}40`, background: `${color}12` }}
+    >
+      <span
+        className="w-[6px] h-[6px] rounded-full shrink-0"
+        style={{ background: color, boxShadow: `0 0 6px ${color}` }}
+      />
+      {name}
     </span>
   );
 }
@@ -99,6 +122,9 @@ function InlineChatDemo() {
   const [inputVal, setInputVal]         = useState("");
   const [started, setStarted]           = useState(false);
   const [userMessages, setUserMessages] = useState<DemoMsg[]>([]);
+  const [isRecording, setIsRecording]   = useState(false);
+  const [agentOpen, setAgentOpen]       = useState(false);
+  const [activeAgent, setActiveAgent]   = useState("HR Agent");
   const bottomRef  = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -111,7 +137,7 @@ function InlineChatDemo() {
     if (!el) return;
     const obs = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting && !started) setStarted(true); },
-      { threshold: 0.35 }
+      { threshold: 0.3 }
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -131,9 +157,7 @@ function InlineChatDemo() {
   }, []);
 
   useEffect(() => {
-    if (started && visibleCount === 0) {
-      setTimeout(() => runDemoStep(0), 500);
-    }
+    if (started && visibleCount === 0) setTimeout(() => runDemoStep(0), 500);
   }, [started, visibleCount, runDemoStep]);
 
   const allMessages: DemoMsg[] = [
@@ -150,11 +174,7 @@ function InlineChatDemo() {
     setTimeout(() => {
       setUserMessages((prev) => [
         ...prev,
-        {
-          role: "agent",
-          agent: "ResumeForge AI",
-          text: "Sign up to unlock the full 6-agent workspace. Your first 3 tailored resumes are free.",
-        },
+        { role: "agent", agent: "ResumeForge AI", text: "Sign up to unlock the full 6-agent workspace. Your first 3 tailored resumes are free." },
       ]);
     }, 950);
   }
@@ -162,101 +182,238 @@ function InlineChatDemo() {
   return (
     <div
       ref={sectionRef}
-      className="relative border border-foreground/10 bg-black/60 backdrop-blur-sm overflow-hidden"
-      style={{ height: 420 }}
+      className="relative overflow-hidden border border-foreground/10"
+      style={{ background: "linear-gradient(135deg, #050508 0%, #08080e 60%, #050508 100%)", minHeight: 520 }}
     >
-      {/* Header bar */}
-      <div className="flex items-center justify-between px-5 py-3 border-b border-foreground/10 bg-black/40 shrink-0">
-        <div className="flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-[#eca8d6]" />
-          <span className="font-mono text-xs text-white/50 uppercase tracking-widest">
-            Live Agent Demo
-          </span>
+      {/* Shader gradient orbs */}
+      <div className="chat-shader-orb chat-shader-orb-1" />
+      <div className="chat-shader-orb chat-shader-orb-2" />
+      <div className="chat-shader-orb chat-shader-orb-3" />
+
+      {/* Animated grid */}
+      <div className="absolute inset-0 chat-grid-bg opacity-100 pointer-events-none" />
+
+      {/* Noise texture */}
+      <div
+        className="absolute inset-0 opacity-[0.025] mix-blend-soft-light pointer-events-none"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
+      {/* Top bar */}
+      <div className="relative z-10 flex items-center justify-between px-5 py-3 border-b border-white/[0.06] backdrop-blur-sm" style={{ background: "rgba(0,0,0,0.35)" }}>
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#eca8d6] shadow-[0_0_8px_#eca8d6]" />
+            <Sparkles className="w-3 h-3 text-white/40" />
+            <span className="font-mono text-[11px] text-white/45 uppercase tracking-[0.15em]">Live Agent Demo</span>
+          </div>
+
+          {/* Agent selector */}
+          <div className="relative">
+            <button
+              onClick={() => setAgentOpen(!agentOpen)}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/10 bg-white/[0.04] hover:bg-white/[0.07] transition-colors"
+            >
+              <span
+                className="w-[6px] h-[6px] rounded-full"
+                style={{ background: AGENT_COLOR[activeAgent], boxShadow: `0 0 5px ${AGENT_COLOR[activeAgent]}` }}
+              />
+              <span className="font-mono text-[10px] text-white/60 uppercase tracking-wider">{activeAgent}</span>
+              <ChevronDown className={`w-3 h-3 text-white/40 transition-transform duration-200 ${agentOpen ? "rotate-180" : ""}`} />
+            </button>
+            {agentOpen && (
+              <div
+                className="absolute top-[calc(100%+6px)] left-0 z-50 min-w-[180px] rounded-xl border border-white/10 overflow-hidden"
+                style={{ background: "linear-gradient(to bottom, rgba(18,18,24,0.97), rgba(10,10,16,0.97))", backdropFilter: "blur(16px)", boxShadow: "0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06), 0 0 20px rgba(236,168,214,0.06)" }}
+              >
+                {AGENTS.map((a) => (
+                  <button
+                    key={a}
+                    className="w-full text-left px-4 py-2.5 flex items-center gap-2.5 hover:bg-white/[0.06] transition-colors"
+                    onClick={() => { setActiveAgent(a); setAgentOpen(false); }}
+                  >
+                    <span
+                      className="w-[6px] h-[6px] rounded-full shrink-0"
+                      style={{ background: AGENT_COLOR[a], boxShadow: `0 0 5px ${AGENT_COLOR[a]}` }}
+                    />
+                    <span className="font-mono text-[11px] text-white/70 uppercase tracking-wider">{a}</span>
+                    {activeAgent === a && <Check className="w-3 h-3 text-white/40 ml-auto" />}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
         <Link
           href="/agents"
-          className="font-mono text-xs text-white/35 hover:text-white/70 transition-colors underline underline-offset-2"
+          className="font-mono text-[11px] text-white/30 hover:text-white/65 transition-colors underline underline-offset-2"
         >
           Open full workspace &rarr;
         </Link>
       </div>
 
-      {/* Message list */}
-      <div
-        className="flex flex-col gap-4 overflow-y-auto px-5 py-4"
-        style={{ height: 324 }}
-      >
-        {allMessages.map((msg, i) => (
+      {/* Main content: orb + messages side by side on wider screens */}
+      <div className="relative z-10 flex flex-col lg:flex-row" style={{ minHeight: 400 }}>
+
+        {/* Left: 3-D Particle Orb */}
+        <div className="flex items-center justify-center lg:w-64 shrink-0 py-6 lg:py-0 border-b lg:border-b-0 lg:border-r border-white/[0.05]">
+          <div className="flex flex-col items-center gap-3">
+            <Suspense
+              fallback={
+                <div className="w-40 h-40 rounded-full border border-white/10 animate-pulse bg-white/[0.03]" />
+              }
+            >
+              <ParticleOrbChat />
+            </Suspense>
+            <span className="font-mono text-[10px] text-white/30 uppercase tracking-widest">Agent Network</span>
+          </div>
+        </div>
+
+        {/* Right: message list */}
+        <div className="flex-1 flex flex-col">
           <div
-            key={i}
-            className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+            className="flex-1 flex flex-col gap-3.5 overflow-y-auto px-5 py-4"
+            style={{ maxHeight: 320 }}
           >
-            {msg.role === "agent" && (
+            {allMessages.map((msg, i) => (
               <div
-                className="w-6 h-6 rounded-full shrink-0 mt-0.5 flex items-center justify-center font-mono text-[9px] font-bold text-black"
-                style={{ background: AGENT_COLOR[msg.agent ?? ""] ?? "#eca8d6" }}
+                key={i}
+                className={`flex gap-2.5 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                {(msg.agent ?? "A")[0]}
+                {msg.role === "agent" && (
+                  <div
+                    className="w-7 h-7 rounded-full shrink-0 mt-0.5 flex items-center justify-center font-mono text-[10px] font-bold text-black"
+                    style={{
+                      background: AGENT_COLOR[msg.agent ?? ""] ?? "#eca8d6",
+                      boxShadow: `0 0 10px ${AGENT_COLOR[msg.agent ?? ""] ?? "#eca8d6"}55`,
+                    }}
+                  >
+                    {(msg.agent ?? "A")[0]}
+                  </div>
+                )}
+                <div className={`max-w-[80%] flex flex-col gap-1 ${msg.role === "user" ? "items-end" : "items-start"}`}>
+                  {msg.role === "agent" && msg.agent && <AgentPill name={msg.agent} />}
+                  <div
+                    className={`px-4 py-2.5 text-sm leading-relaxed font-sans ${
+                      msg.role === "user"
+                        ? "text-white/85 rounded-tl-2xl rounded-bl-2xl rounded-tr-sm rounded-br-2xl"
+                        : "text-white/75 rounded-tl-sm rounded-tr-2xl rounded-bl-2xl rounded-br-2xl"
+                    }`}
+                    style={
+                      msg.role === "user"
+                        ? { background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)" }
+                        : {
+                            background: "rgba(255,255,255,0.04)",
+                            border: `1px solid ${AGENT_COLOR[msg.agent ?? ""] ?? "#eca8d6"}28`,
+                            boxShadow: `0 0 20px ${AGENT_COLOR[msg.agent ?? ""] ?? "#eca8d6"}08`,
+                          }
+                    }
+                  >
+                    {msg.text}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {typing && (
+              <div className="flex gap-2.5 justify-start">
+                <div className="w-7 h-7 rounded-full shrink-0 bg-white/[0.06] border border-white/10 flex items-center justify-center">
+                  <span className="font-mono text-[9px] text-white/30">…</span>
+                </div>
+                <div
+                  className="px-4 py-3 rounded-tl-sm rounded-tr-2xl rounded-bl-2xl rounded-br-2xl"
+                  style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
+                >
+                  <TypingDots />
+                </div>
               </div>
             )}
+            <div ref={bottomRef} />
+          </div>
+
+          {/* Voice recording bar */}
+          {isRecording && (
             <div
-              className={`max-w-[82%] flex flex-col gap-1 ${
-                msg.role === "user" ? "items-end" : "items-start"
-              }`}
+              className="mx-4 mb-2 flex items-center justify-between gap-4 px-5 py-2.5 rounded-full border border-white/10"
+              style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)" }}
             >
-              {msg.role === "agent" && msg.agent && (
-                <span
-                  className="font-mono text-[10px] uppercase tracking-widest"
-                  style={{ color: AGENT_COLOR[msg.agent] ?? "#eca8d6" }}
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                <span className="font-mono text-[11px] text-white/60">Recording…</span>
+              </div>
+              <div className="flex-1 flex items-center justify-center gap-[2px] h-8 overflow-hidden">
+                {Array.from({ length: 48 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="voice-wave-bar-h bg-white/60"
+                    style={{ animationDelay: `${-i * 0.025}s` }}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => setIsRecording(false)}
+                  className="w-7 h-7 rounded-full flex items-center justify-center bg-white/[0.06] hover:bg-red-500/20 border border-white/10 transition-colors"
                 >
-                  {msg.agent}
-                </span>
-              )}
-              <div
-                className={`px-4 py-2.5 text-sm leading-relaxed font-sans ${
-                  msg.role === "user"
-                    ? "bg-white/10 text-white/90 rounded-tl-xl rounded-bl-xl rounded-tr-sm rounded-br-xl"
-                    : "bg-foreground/5 text-white/80 border border-foreground/10 rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-xl"
-                }`}
-              >
-                {msg.text}
+                  <X className="w-3 h-3 text-white/60" />
+                </button>
+                <button
+                  onClick={() => setIsRecording(false)}
+                  className="w-7 h-7 rounded-full flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/15 transition-colors"
+                >
+                  <Check className="w-3 h-3 text-white/80" />
+                </button>
               </div>
             </div>
-          </div>
-        ))}
+          )}
 
-        {typing && (
-          <div className="flex gap-3 justify-start">
-            <div className="w-6 h-6 rounded-full shrink-0 bg-white/10 flex items-center justify-center">
-              <span className="font-mono text-[9px] text-white/40">…</span>
+          {/* Input bar */}
+          <form
+            onSubmit={handleSend}
+            className="mx-4 mb-4 chat-input-3d rounded-2xl"
+            style={{
+              background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.03) 100%)",
+              border: "1px solid rgba(255,255,255,0.09)",
+              backdropFilter: "blur(16px)",
+            }}
+          >
+            <div className="flex items-start gap-3 px-4 pt-3 pb-2">
+              <textarea
+                rows={1}
+                value={inputVal}
+                onChange={(e) => setInputVal(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(e as unknown as React.FormEvent); } }}
+                placeholder="Ask the agents anything…"
+                className="flex-1 bg-transparent text-sm text-white/80 placeholder:text-white/25 focus:outline-none resize-none font-sans leading-relaxed"
+                style={{ minHeight: 24, maxHeight: 80 }}
+              />
             </div>
-            <div className="px-4 py-3 bg-foreground/5 border border-foreground/10 rounded-tl-sm rounded-tr-xl rounded-bl-xl rounded-br-xl">
-              <TypingDots />
+            <div className="flex items-center justify-between px-3 pb-2.5 border-t border-white/[0.05] pt-2">
+              <span className="font-mono text-[10px] text-white/25 uppercase tracking-widest hidden sm:block">
+                Powered by 6 AI agents
+              </span>
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  type="button"
+                  onClick={() => setIsRecording(true)}
+                  className="w-7 h-7 rounded-full flex items-center justify-center border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] transition-colors"
+                >
+                  <Mic className="w-3.5 h-3.5 text-white/50" />
+                </button>
+                <button
+                  type="submit"
+                  className="chat-send-btn w-7 h-7 rounded-full flex items-center justify-center"
+                >
+                  <Send className="w-3.5 h-3.5 text-white/70" />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-        <div ref={bottomRef} />
+          </form>
+        </div>
       </div>
-
-      {/* Input */}
-      <form
-        onSubmit={handleSend}
-        className="absolute bottom-0 inset-x-0 flex items-center gap-3 px-4 py-3 border-t border-foreground/10 bg-black/70 backdrop-blur-sm"
-      >
-        <input
-          type="text"
-          value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
-          placeholder="Ask the agents anything…"
-          className="flex-1 bg-transparent font-sans text-sm text-white/80 placeholder:text-white/25 focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors shrink-0"
-        >
-          <Send className="w-3.5 h-3.5 text-white/55" />
-        </button>
-      </form>
     </div>
   );
 }
