@@ -147,11 +147,9 @@ export function SignupContent() {
       "resumeforge_user",
       JSON.stringify({ name, email, company: role === "recruiter" ? company : undefined })
     );
-    if (role === "recruiter") {
-      router.push("/recruiter");
-    } else {
-      router.push("/onboarding");
-    }
+    // Both roles go through onboarding first; the onboarding flow reads the
+    // saved role and shows the matching question set + final destination.
+    router.push("/onboarding");
   }
 
   return (

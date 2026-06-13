@@ -14,9 +14,11 @@ type Step =
 
 type Answers = Record<number, string | string[]>;
 
+type Role = "candidate" | "recruiter";
+
 // ─── Steps data ───────────────────────────────────────────────────────────────
 
-const STEPS: Step[] = [
+const CANDIDATE_STEPS: Step[] = [
   {
     type: "single",
     question: "What best describes you right now?",
@@ -112,7 +114,86 @@ const STEPS: Step[] = [
   },
 ];
 
-const TOTAL = STEPS.length;
+const RECRUITER_STEPS: Step[] = [
+  {
+    type: "single",
+    question: "What best describes your role?",
+    options: [
+      "In-House Recruiter",
+      "Technical Recruiter",
+      "Agency Recruiter",
+      "Hiring Manager",
+      "Founder / CEO",
+      "HR / People Ops",
+    ],
+  },
+  {
+    type: "single",
+    question: "How large is your company?",
+    options: [
+      "1 – 10 (Startup)",
+      "11 – 50",
+      "51 – 200",
+      "201 – 1,000",
+      "1,000+ (Enterprise)",
+      "Agency (multiple clients)",
+    ],
+  },
+  {
+    type: "multi",
+    question: "Which roles are you hiring for?",
+    options: [
+      "Frontend",
+      "Backend",
+      "Full-Stack",
+      "AI / ML",
+      "Mobile",
+      "DevOps / SRE",
+      "Security",
+      "Data Engineering",
+      "Engineering Management",
+      "Design",
+    ],
+  },
+  {
+    type: "multi",
+    question: "What matters most when verifying a candidate?",
+    options: [
+      "Verified work history",
+      "Real GitHub activity",
+      "Fraud / claim detection",
+      "Skill-to-role match",
+      "Open-source contributions",
+      "Live project proof",
+      "Reference checks",
+      "Coding assessments",
+    ],
+  },
+  {
+    type: "single",
+    question: "How many hires are you planning this quarter?",
+    options: [
+      "1 – 2 roles",
+      "3 – 5 roles",
+      "6 – 10 roles",
+      "10+ roles",
+      "Always-on pipeline",
+      "Just exploring",
+    ],
+  },
+  {
+    type: "text",
+    question: "In one line — what's your biggest hiring challenge?",
+    placeholder: "e.g. Filtering real builders from resume keyword stuffers",
+  },
+];
+
+const RECRUITER_STORAGE_KEY = "resumeforge_recruiter_onboarding_v1";
+
+const STEP_CONFIG: Record<Role, Step[]> = {
+  candidate: CANDIDATE_STEPS,
+  recruiter: RECRUITER_STEPS,
+};
 
 // ─── Chip component ───────────────────────────────────────────────────────────
 
@@ -173,8 +254,8 @@ function Chip({
 
 // ─── Progress bar ─────────────────────────────────────────────────────────────
 
-function ProgressBar({ step }: { step: number }) {
-  const pct = ((step + 1) / TOTAL) * 100;
+function ProgressBar({ step, total }: { step: number; total: number }) {
+  const pct = ((step + 1) / total) * 100;
   return (
     <div className="w-full h-[2px] rounded-full" style={{ background: "rgba(255,255,255,0.08)" }}>
       <motion.div
@@ -189,8 +270,16 @@ function ProgressBar({ step }: { step: number }) {
 
 // ─── Completion screen ────────────────────────────────────────────────────────
 
-function CompletionScreen() {
+function CompletionScreen({ role }: { role: Role }) {
   const [loadingDone, setLoadingDone] = useState(false);
+
+  const isRecruiter = role === "recruiter";
+  const destination = isRecruiter ? "/recruiter" : "/devpulse";
+  const ctaLabel = isRecruiter ? "Enter Dashboard" : "Enter DevPulse";
+  const title = isRecruiter ? "Your Recruiter Hub is Ready" : "Your Dev Profile is Live";
+  const subtitle = isRecruiter
+    ? "Calibrating your verification dashboard..."
+    : "Xrivu.01 is building your skill radar now...";
 
   useEffect(() => {
     const t = setTimeout(() => setLoadingDone(true), 2200);
@@ -237,10 +326,10 @@ function CompletionScreen() {
           className="text-3xl sm:text-4xl font-sans font-semibold tracking-tight"
           style={{ color: "#fff" }}
         >
-          Your Dev Profile is Live
+          {title}
         </h2>
         <p className="font-mono text-sm" style={{ color: "rgba(255,255,255,0.45)" }}>
-          Xrivu.01 is building your skill radar now...
+          {subtitle}
         </p>
       </div>
 
