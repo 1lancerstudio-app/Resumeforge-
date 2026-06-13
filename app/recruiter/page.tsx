@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, Mail, Phone, MapPin, Calendar, Gift, MessageCircle, Phone as PhoneCall } from "lucide-react";
+import { ChevronLeft, ChevronRight, Mail, Phone, MapPin, Calendar, Gift, MessageCircle, BarChart3, Users, Clock, FileText, User, Cpu, Home, TrendingUp, Settings, HelpCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RoleGuard } from "@/components/auth/role-guard";
 import Link from "next/link";
@@ -9,38 +9,38 @@ import Link from "next/link";
 const teamHierarchy = {
   name: "Courtney Henry",
   role: "HR-VP",
-  avatar: "👩‍💼",
+  avatar: null,
   team: [
     {
       name: "Admin",
       role: "Admin",
-      avatar: "👨‍💼",
+      avatar: null,
       team: [
-        { name: "Recruiting Manager", role: "Recruiting Manager", avatar: "👩‍💼", team: [
-          { name: "Sr. Recruiter", role: "Sr. Recruiter", avatar: "👨‍💼", team: [] },
-          { name: "Mid Recruiter", role: "Mid Recruiter", avatar: "👩‍💼", team: [] },
-          { name: "Recruiter", role: "Recruiter", avatar: "👨‍💼", team: [] },
+        { name: "Recruiting Manager", role: "Recruiting Manager", avatar: null, team: [
+          { name: "Sr. Recruiter", role: "Sr. Recruiter", avatar: null, team: [] },
+          { name: "Mid Recruiter", role: "Mid Recruiter", avatar: null, team: [] },
+          { name: "Recruiter", role: "Recruiter", avatar: null, team: [] },
         ]},
-        { name: "PM", role: "PM", avatar: "👩‍💼", team: [] },
+        { name: "PM", role: "PM", avatar: null, team: [] },
       ]
     },
     {
       name: "Sourcing Manager",
       role: "Sourcing Manager",
-      avatar: "👨‍💼",
+      avatar: null,
       team: [
-        { name: "Sr. Recruiter", role: "Sr. Recruiter", avatar: "👩‍💼", team: [] },
-        { name: "Sourcer", role: "Sourcer", avatar: "👨‍💼", team: [] },
-        { name: "Sourcer", role: "Sourcer", avatar: "👩‍💼", team: [] },
+        { name: "Sr. Recruiter", role: "Sr. Recruiter", avatar: null, team: [] },
+        { name: "Sourcer", role: "Sourcer", avatar: null, team: [] },
+        { name: "Sourcer", role: "Sourcer", avatar: null, team: [] },
       ]
     },
     {
       name: "Coordinator",
       role: "Coordinator",
-      avatar: "👩‍💼",
+      avatar: null,
       team: [
-        { name: "Intern", role: "Intern", avatar: "👨‍💼", team: [] },
-        { name: "Intern", role: "Intern", avatar: "👩‍💼", team: [] },
+        { name: "Intern", role: "Intern", avatar: null, team: [] },
+        { name: "Intern", role: "Intern", avatar: null, team: [] },
       ]
     },
   ]
@@ -58,7 +58,7 @@ function TeamNode({ member, level = 0 }: { member: TeamMember; level?: number })
     <div className="flex flex-col items-center">
       <div className="flex flex-col items-center mb-4">
         <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-lg mb-2 shadow-md">
-          {member.avatar}
+          <User size={20} className="text-white" />
         </div>
         <span className="font-semibold text-sm text-gray-900">{member.name}</span>
         <span className="text-xs text-gray-500">{member.role}</span>
@@ -147,10 +147,10 @@ export default function RecruiterDetailsPage() {
               Main
             </div>
             {[
-              { icon: "📊", label: "Dashboard" },
-              { icon: "👥", label: "Candidates" },
-              { icon: "📅", label: "Interviews" },
-              { icon: "📝", label: "Offers & Hires" },
+              { icon: <BarChart3 size={20} />, label: "Dashboard" },
+              { icon: <Users size={20} />, label: "Candidates" },
+              { icon: <Clock size={20} />, label: "Interviews" },
+              { icon: <FileText size={20} />, label: "Offers & Hires" },
             ].map((item) => (
               <Link
                 key={item.label}
@@ -171,10 +171,10 @@ export default function RecruiterDetailsPage() {
               Tools
             </div>
             {[
-              { icon: "👤", label: "Recruiter Profile", active: true },
-              { icon: "🤖", label: "Sora" },
-              { icon: "🏠", label: "The Hub" },
-              { icon: "📈", label: "Reports & Analytics" },
+              { icon: <User size={20} />, label: "Recruiter Profile", active: true },
+              { icon: <Cpu size={20} />, label: "Sora" },
+              { icon: <Home size={20} />, label: "The Hub" },
+              { icon: <TrendingUp size={20} />, label: "Reports & Analytics" },
             ].map((item) => (
               <Link
                 key={item.label}
@@ -197,9 +197,9 @@ export default function RecruiterDetailsPage() {
               Others
             </div>
             {[
-              { icon: "⚙️", label: "Settings" },
-              { icon: "❓", label: "Help & Center" },
-              { icon: "🚪", label: "Sign out" },
+              { icon: <Settings size={20} />, label: "Settings" },
+              { icon: <HelpCircle size={20} />, label: "Help & Center" },
+              { icon: <LogOut size={20} />, label: "Sign out" },
             ].map((item) => (
               <Link
                 key={item.label}
@@ -259,7 +259,7 @@ export default function RecruiterDetailsPage() {
 
                   <div className="w-full space-y-4 text-left border-t border-gray-200 pt-6">
                     <div className="flex items-start gap-3">
-                      <PhoneCall size={18} className="text-gray-400 mt-0.5" />
+                      <Phone size={18} className="text-gray-400 mt-0.5" />
                       <div>
                         <p className="text-xs text-gray-500 font-semibold">Phone</p>
                         <p className="text-gray-900 font-medium">(123) 456-7890</p>
@@ -289,10 +289,10 @@ export default function RecruiterDetailsPage() {
                   </div>
 
                   <div className="flex gap-3 w-full mt-6">
-                    <Button className="flex-1 bg-white text-gray-900 border border-gray-300 hover:bg-gray-50">
-                      <PhoneCall size={18} /> Call
+                    <Button className="flex-1 bg-white text-gray-900 border border-gray-300 hover:bg-gray-50 gap-2">
+                      <Phone size={18} /> Call
                     </Button>
-                    <Button className="flex-1 bg-blue-600 text-white hover:bg-blue-700">
+                    <Button className="flex-1 bg-blue-600 text-white hover:bg-blue-700 gap-2">
                       <MessageCircle size={18} /> Message
                     </Button>
                   </div>
