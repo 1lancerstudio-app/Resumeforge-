@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Check, Eye, EyeOff } from "lucide-react";
@@ -119,6 +120,29 @@ function RoleCard({
 }
 
 export default function SignupPage() {
+  return (
+    <Suspense fallback={<SignupPageFallback />}>
+      <SignupPageContent />
+    </Suspense>
+  );
+}
+
+function SignupPageFallback() {
+  return (
+    <div className="min-h-screen bg-background flex">
+      <div className="flex-1 flex items-center justify-center">
+        <div className="animate-pulse font-display text-xl text-foreground">
+          Loading...
+        </div>
+      </div>
+      <div className="hidden lg:flex lg:w-[45%]">
+        <DecorativePanel quote="Your next opportunity starts with the right first impression." />
+      </div>
+    </div>
+  );
+}
+
+function SignupPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState<1 | 2>(1);
