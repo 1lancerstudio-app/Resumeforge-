@@ -144,6 +144,9 @@ export default function QuestionnairePage() {
   const isAnswered = () => {
     const value = data[currentQuestion.id as keyof QuestionnaireData];
     if (currentQuestion.type === "single") return !!value;
+    if (currentQuestion.id === "skills") {
+      return Array.isArray(value) && value.length > 0 && value.some((s) => s.trim().length > 0);
+    }
     if (typeof value === "string") return value.trim().length > 0;
     return false;
   };
