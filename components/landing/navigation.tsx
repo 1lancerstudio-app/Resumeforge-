@@ -56,16 +56,20 @@ export function Navigation({ isChat = false }) {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-12">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`text-sm transition-colors duration-300 relative group ${link.name === "Try AI Chat" ? (isScrolled ? "text-foreground font-semibold" : "text-white font-semibold") : (isScrolled ? "text-foreground/70 hover:text-foreground" : "text-white/70 hover:text-white")}`}
-              >
-                {link.name}
-                <span className={`absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full ${isScrolled ? "bg-foreground" : "bg-white"}`} />
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              // On chat page, navigate to landing page with anchor for non-external links
+              const href = isChat && !link.isExternal ? `/${link.href}` : link.href;
+              return (
+                <Link
+                  key={link.name}
+                  href={href}
+                  className={`text-sm transition-colors duration-300 relative group ${link.name === "Try AI Chat" ? (isScrolled ? "text-foreground font-semibold" : "text-white font-semibold") : (isScrolled ? "text-foreground/70 hover:text-foreground" : "text-white/70 hover:text-white")}`}
+                >
+                  {link.name}
+                  <span className={`absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full ${isScrolled ? "bg-foreground" : "bg-white"}`} />
+                </Link>
+              );
+            })}
           </div>
 
           {/* Desktop CTA */}
@@ -110,21 +114,25 @@ export function Navigation({ isChat = false }) {
         <div className="flex flex-col h-full px-8 pt-28 pb-8">
           {/* Navigation Links */}
           <div className="flex-1 flex flex-col justify-center gap-8">
-            {navLinks.map((link, i) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-5xl font-display transition-all duration-500 ${link.name === "Try AI Chat" ? "text-foreground font-display" : "text-foreground hover:text-muted-foreground"} ${
-                  isMobileMenuOpen 
-                    ? "opacity-100 translate-y-0" 
-                    : "opacity-0 translate-y-4"
-                }`}
-                style={{ transitionDelay: isMobileMenuOpen ? `${i * 75}ms` : "0ms" }}
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link, i) => {
+              // On chat page, navigate to landing page with anchor for non-external links
+              const href = isChat && !link.isExternal ? `/${link.href}` : link.href;
+              return (
+                <Link
+                  key={link.name}
+                  href={href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`text-5xl font-display transition-all duration-500 ${link.name === "Try AI Chat" ? "text-foreground font-display" : "text-foreground hover:text-muted-foreground"} ${
+                    isMobileMenuOpen 
+                      ? "opacity-100 translate-y-0" 
+                      : "opacity-0 translate-y-4"
+                  }`}
+                  style={{ transitionDelay: isMobileMenuOpen ? `${i * 75}ms` : "0ms" }}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
           
           {/* Bottom CTAs */}
