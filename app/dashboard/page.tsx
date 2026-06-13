@@ -7,6 +7,9 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav } from "@/components/auth/dashboard-nav";
 import { RoleGuard } from "@/components/auth/role-guard";
+import { ExternalLinks } from "@/components/profile/external-links";
+import { EditExternalLinks } from "@/components/profile/edit-external-links";
+import type { ExternalLink } from "@/lib/external-platforms";
 
 const navLinks = [
   { name: "My Resumes", href: "/dashboard" },
@@ -24,6 +27,8 @@ const statCards = [
 export default function DashboardPage() {
   const [userName, setUserName] = useState("there");
   const [initials, setInitials] = useState("U");
+  const [isEditLinksOpen, setIsEditLinksOpen] = useState(false);
+  const [externalLinks, setExternalLinks] = useState<ExternalLink[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -59,6 +64,10 @@ export default function DashboardPage() {
   const hour = new Date().getHours();
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+
+  const handleSaveExternalLinks = (links: ExternalLink[]) => {
+    setExternalLinks(links);
+  };
 
   return (
     <>
@@ -120,7 +129,20 @@ export default function DashboardPage() {
               Your AI agents are standing by.
             </p>
           </div>
+
+          {/* External Links Section */}
+          <div className="px-6 lg:px-10 py-16 border-t border-border">
+            <ExternalLinks onEdit={() => setIsEditLinksOpen(true)} />
+          </div>
         </main>
+
+        {/* Edit External Links Modal */}
+        <EditExternalLinks
+          isOpen={isEditLinksOpen}
+          onClose={() => setIsEditLinksOpen(false)}
+          onSave={handleSaveExternalLinks}
+          initialLinks={externalLinks}
+        />
       </div>
     </>
   );
