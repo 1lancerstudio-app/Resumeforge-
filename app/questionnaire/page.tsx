@@ -72,7 +72,7 @@ export default function QuestionnairePage() {
     const isNewUser = localStorage.getItem("resumeforge_new_user");
 
     if (!storedRole || isNewUser !== "true") {
-      router.replace("/dashboard");
+      router.replace("/chat");
       return;
     }
 
@@ -100,7 +100,7 @@ export default function QuestionnairePage() {
         JSON.stringify(data)
       );
       localStorage.setItem("resumeforge_new_user", "false");
-      router.push("/dashboard");
+      router.push("/chat");
     }
   };
 
