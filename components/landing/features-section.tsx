@@ -126,10 +126,18 @@ function InlineChatDemo() {
   const [agentOpen, setAgentOpen]       = useState(false);
   const [activeAgent, setActiveAgent]   = useState("HR Agent");
   const bottomRef  = useRef<HTMLDivElement>(null);
+  const listRef    = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Scroll ONLY the inner message list, never the page/window.
+    // Using scrollIntoView here would scroll every scrollable ancestor
+    // (including the document), causing the landing page to lurch while
+    // the user scrolls past the section.
+    const list = listRef.current;
+    if (list) {
+      list.scrollTo({ top: list.scrollHeight, behavior: "smooth" });
+    }
   }, [visibleCount, typing, userMessages]);
 
   useEffect(() => {
@@ -275,6 +283,7 @@ function InlineChatDemo() {
         {/* Right: message list */}
         <div className="flex-1 flex flex-col">
           <div
+            ref={listRef}
             className="flex-1 flex flex-col gap-3.5 overflow-y-auto px-5 py-4"
             style={{ maxHeight: 320 }}
           >
