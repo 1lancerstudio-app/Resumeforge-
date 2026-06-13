@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,8 +24,16 @@ const statCards = [
 export default function DashboardPage() {
   const [userName, setUserName] = useState("there");
   const [initials, setInitials] = useState("U");
+  const router = useRouter();
 
   useEffect(() => {
+    // Check if user needs to complete questionnaire
+    const isNewUser = localStorage.getItem("resumeforge_new_user");
+    if (isNewUser === "true") {
+      router.replace("/questionnaire");
+      return;
+    }
+
     const stored = localStorage.getItem("resumeforge_user");
     if (stored) {
       try {
@@ -45,7 +54,7 @@ export default function DashboardPage() {
         /* ignore */
       }
     }
-  }, []);
+  }, [router]);
 
   const hour = new Date().getHours();
   const greeting =

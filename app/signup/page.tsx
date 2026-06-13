@@ -147,10 +147,13 @@ export default function SignupPage() {
       "resumeforge_user",
       JSON.stringify({ name, email, company: role === "recruiter" ? company : undefined })
     );
+    // Mark as new user to trigger questionnaire
+    localStorage.setItem("resumeforge_new_user", "true");
     if (role === "recruiter") {
       router.push("/recruiter");
     } else {
-      router.push("/dashboard");
+      // Redirect to questionnaire for candidates
+      router.push("/questionnaire");
     }
   }
 
