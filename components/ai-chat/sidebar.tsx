@@ -3,10 +3,11 @@ import {
   MessageSquare,
   Archive,
   BookOpen,
-  FolderPlus,
-  ImageIcon,
-  Presentation,
   FileText,
+  Zap,
+  Briefcase,
+  Target,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -68,37 +69,37 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* Workspaces Section */}
+        {/* Resume Features Section */}
         <div>
-          <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Workspaces</h3>
+          <h3 className="px-3 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resume Tools</h3>
           <div className="space-y-1">
             <Button
               variant="ghost"
               className="btn-3d w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent font-medium"
             >
-              <FolderPlus className="w-4 h-4" />
-              New Project
-            </Button>
-            <Button
-              variant="ghost"
-              className="btn-3d w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent font-medium"
-            >
-              <ImageIcon className="w-4 h-4" />
-              Image
-            </Button>
-            <Button
-              variant="ghost"
-              className="btn-3d w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent font-medium"
-            >
-              <Presentation className="w-4 h-4" />
-              Presentation
-            </Button>
-            <Button
-              variant="ghost"
-              className="btn-3d w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent font-medium"
-            >
               <FileText className="w-4 h-4" />
-              Research
+              Build Resume
+            </Button>
+            <Button
+              variant="ghost"
+              className="btn-3d w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent font-medium"
+            >
+              <Briefcase className="w-4 h-4" />
+              My Resumes
+            </Button>
+            <Button
+              variant="ghost"
+              className="btn-3d w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent font-medium"
+            >
+              <Zap className="w-4 h-4" />
+              Interview Prep
+            </Button>
+            <Button
+              variant="ghost"
+              className="btn-3d w-full justify-start gap-3 text-sidebar-foreground hover:bg-sidebar-accent font-medium"
+            >
+              <Target className="w-4 h-4" />
+              Job Matching
             </Button>
           </div>
         </div>
