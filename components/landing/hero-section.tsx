@@ -131,7 +131,7 @@ export function HeroSection() {
           aria-hidden="true"
           className="w-full h-full object-cover object-center opacity-80"
         >
-          <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/bg-hero-0BnFGdr81Ifnj3WbBZoNt1KE4D5DMT.mp4" type="video/mp4" />
+          <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Origami_plane_soaring_night_sky_202606131134-HoFQ2TxED1xE7bFL7tcsPz5SZDUkpL.mp4" type="video/mp4" />
         </video>
         {/* Subtle overlay to ensure text readability on the left */}
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
