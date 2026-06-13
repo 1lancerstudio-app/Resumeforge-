@@ -14,36 +14,38 @@ const navLinks = [
   { name: "Try AI Chat",   href: "/chat",         isExternal: true },
 ];
 
-export function Navigation() {
+export function Navigation({ isChat = false }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      if (!isChat) {
+        setIsScrolled(window.scrollY > 20);
+      }
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isChat]);
 
   return (
     <header
-      className={`fixed z-50 transition-all duration-500 ${
-        isScrolled 
-          ? "top-4 left-4 right-4" 
-          : "top-0 left-0 right-0"
+      className={`${isChat ? "relative z-40" : "fixed z-50"} transition-all duration-500 ${
+        !isChat && (isScrolled ? "top-4 left-4 right-4" : "top-0 left-0 right-0")
       }`}
     >
       <nav 
         className={`mx-auto transition-all duration-500 ${
-          isScrolled || isMobileMenuOpen
+          isChat
+            ? "w-full bg-background/0 backdrop-blur-0 border-b border-border/10 rounded-none shadow-none max-w-full"
+            : isScrolled || isMobileMenuOpen
             ? "bg-background/80 backdrop-blur-xl border border-foreground/10 rounded-2xl shadow-lg max-w-[1200px]"
             : "bg-transparent max-w-[1400px]"
         }`}
       >
         <div 
           className={`flex items-center justify-between transition-all duration-500 px-6 lg:px-8 ${
-            isScrolled ? "h-14" : "h-20"
+            isChat ? "h-16" : isScrolled ? "h-14" : "h-20"
           }`}
         >
           {/* Logo */}

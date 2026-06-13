@@ -12,7 +12,7 @@ function ChatContent() {
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
-      <Navigation />
+      <Navigation isChat={true} />
       <div className="flex flex-1 relative overflow-hidden">
         {/* Sidebar Toggle Button */}
         <button
