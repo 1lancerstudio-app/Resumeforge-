@@ -15,7 +15,6 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
-import { ParticleOrb } from "@/components/ai-chat/particle-orb"
 
 export function ChatArea() {
   const [isRecording, setIsRecording] = useState(false)
@@ -46,7 +45,7 @@ export function ChatArea() {
       />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-border/50 backdrop-blur-sm bg-background/30">
+      <header className="relative z-10 flex items-center justify-between px-6 py-4 backdrop-blur-sm bg-background/30">
         <div className="relative">
           <Button
             className="btn-3d btn-glow gap-2 bg-gradient-to-br from-secondary/90 to-secondary/70 text-foreground hover:from-secondary/70 hover:to-secondary/50 backdrop-blur-sm border border-border/30 shadow-lg"
@@ -132,10 +131,6 @@ export function ChatArea() {
 
       {/* Main Content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pb-6">
-        <div className="relative mb-8">
-          <ParticleOrb />
-        </div>
-
         {/* Title */}
         <h1 className="text-4xl font-semibold text-foreground mb-8 text-center font-display tracking-tight">
           Ready to Create Something New?
@@ -169,7 +164,7 @@ export function ChatArea() {
         {/* Input Area */}
         <div className="w-full max-w-4xl">
           {isRecording && (
-            <div className="mb-3 input-3d bg-gradient-to-r from-black/90 via-black/95 to-black/90 backdrop-blur-xl rounded-full border border-border/50 px-6 py-3 shadow-2xl animate-in slide-in-from-bottom-2 fade-in duration-300">
+            <div className="mb-3 input-3d bg-gradient-to-r from-black/90 via-black/95 to-black/90 backdrop-blur-xl rounded-full px-6 py-3 shadow-2xl animate-in slide-in-from-bottom-2 fade-in duration-300">
               <div className="flex items-center justify-between gap-6">
                 {/* Left: Recording indicator */}
                 <div className="flex items-center gap-2 shrink-0">
@@ -214,7 +209,7 @@ export function ChatArea() {
             </div>
           )}
 
-          <div className="input-3d bg-gradient-to-br from-secondary/70 via-secondary/60 to-secondary/50 backdrop-blur-xl rounded-2xl border border-border/50 p-4 shadow-2xl">
+          <div className="input-3d bg-gradient-to-br from-secondary/70 via-secondary/60 to-secondary/50 backdrop-blur-xl rounded-2xl p-4 shadow-2xl">
             <div className="space-y-4">
               <div className="flex items-start gap-3">
                 <textarea
@@ -222,7 +217,7 @@ export function ChatArea() {
                   className="flex-1 bg-transparent border-none outline-none resize-none text-foreground placeholder:text-muted-foreground text-lg min-h-[80px] font-normal"
                 />
               </div>
-              <div className="flex items-center justify-between pt-2 border-t border-border/30">
+              <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center gap-4">
                   <Button
                     variant="ghost"

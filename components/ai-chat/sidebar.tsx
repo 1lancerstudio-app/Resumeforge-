@@ -13,9 +13,9 @@ import { Button } from "@/components/ui/button"
 
 export function Sidebar() {
   return (
-    <aside className="w-80 bg-sidebar border-r border-sidebar-border flex flex-col">
+    <aside className="w-80 bg-sidebar flex flex-col">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between border-b border-sidebar-border">
+      <div className="p-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
             <div className="w-5 h-5 rounded-full border-2 border-primary-foreground" />
