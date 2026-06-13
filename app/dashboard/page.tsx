@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DashboardNav } from "@/components/auth/dashboard-nav";
 import { RoleGuard } from "@/components/auth/role-guard";
+import { GitHubConnect } from "@/components/auth/github-connect";
 
 const navLinks = [
   { name: "My Resumes", href: "/dashboard" },
@@ -110,6 +111,14 @@ export default function DashboardPage() {
             <p className="font-mono text-xs text-muted-foreground mt-12">
               Your AI agents are standing by.
             </p>
+
+            {/* GitHub integration */}
+            <div className="mt-12 max-w-xl">
+              <p className="font-mono text-xs text-muted-foreground uppercase tracking-widest mb-4">
+                Integrations
+              </p>
+              <GitHubConnect />
+            </div>
           </div>
         </main>
       </div>
