@@ -317,6 +317,16 @@
     50%      { opacity: 0.7; transform: scale(1.12); }
   }
 
+  @keyframes orbit-dot {
+    from { transform: translateY(-50%) rotate(0deg) translateX(var(--orbit-r, 40px)); }
+    to   { transform: translateY(-50%) rotate(360deg) translateX(var(--orbit-r, 40px)); }
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
   /* Auth page decorative panel blob drift */
   .blob-1 {
     animation: blob-drift-1 20s ease-in-out infinite alternate;
