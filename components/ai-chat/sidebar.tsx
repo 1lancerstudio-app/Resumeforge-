@@ -13,25 +13,20 @@ import { Button } from "@/components/ui/button"
 
 export function Sidebar() {
   return (
-    <aside className="w-80 bg-sidebar flex flex-col">
+    <aside className="w-80 bg-gradient-to-b from-sidebar to-sidebar/95 flex flex-col h-full border-r border-border/10">
       {/* Header */}
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <div className="w-5 h-5 rounded-full border-2 border-primary-foreground" />
+      <div className="p-4 flex items-center justify-between border-b border-border/10">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center shadow-lg">
+            <div className="w-5 h-5 rounded-full border-2 border-white/60" />
           </div>
-          <span className="text-lg font-semibold text-sidebar-foreground font-display tracking-tight">
-            ResumeForge AI
-          </span>
+          <div>
+            <span className="text-sm font-semibold text-sidebar-foreground font-display tracking-tight">
+              ResumeForge
+            </span>
+            <span className="text-xs text-muted-foreground ml-1">AI</span>
+          </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-sidebar-foreground">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 3H7V7H3V3Z" fill="currentColor" opacity="0.5" />
-            <path d="M9 3H13V7H9V3Z" fill="currentColor" opacity="0.5" />
-            <path d="M3 9H7V13H3V9Z" fill="currentColor" opacity="0.5" />
-            <path d="M9 9H13V13H9V9Z" fill="currentColor" opacity="0.5" />
-          </svg>
-        </Button>
       </div>
 
       {/* New Chat Button */}

@@ -503,4 +503,85 @@
       transform: translateY(0);
     }
   }
+
+  /* Enhanced interaction animations */
+  @keyframes fade-in-scale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes subtle-bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-2px);
+    }
+  }
+
+  @keyframes gentle-float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+    }
+  }
+
+  .fade-in-scale {
+    animation: fade-in-scale 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .subtle-bounce {
+    animation: subtle-bounce 2s ease-in-out infinite;
+  }
+
+  .gentle-float {
+    animation: gentle-float 3s ease-in-out infinite;
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Sidebar transition animations */
+  .sidebar-enter {
+    animation: slide-in-from-bottom-2 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Button interaction improvements */
+  button, [role="button"] {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  button:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+
+  /* Input focus state improvements */
+  input:focus, textarea:focus {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Smooth color transitions */
+  * {
+    --tw-transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    --tw-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    --tw-transition-duration: 200ms;
+  }
 }
