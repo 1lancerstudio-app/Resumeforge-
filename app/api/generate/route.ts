@@ -1,0 +1,83 @@
+export const maxDuration = 30;
+
+const MODEL = "gemini-2.0-flash";
+
+export async function POST(req: Request) {
+  const { topic, tone, category, context } = await req.json();
+
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) {
+    return new Response("GOOGLE_GENERATIVE_AI_API_KEY is not set", { status: 500 });
+  }
+
+  const systemInstruction = `You are an expert resume and career writing AI prompt engineer. Your sole task is to craft highly effective, clear, and targeted prompts for use with AI resume builders and career tools.
+
+Output ONLY the generated prompt — no explanations, no preamble, no markdown, no surrounding quotes. Just the raw prompt text itself.
+
+Guidelines:
+- Be specific, clear, and unambiguous
+- Include necessary context and constraints
+- Use role-setting when appropriate
+- Structure complex prompts with clear sections
+- Optimize for the requested tone and category`;
+
+  const userMessage = `Generate a high-quality AI prompt for the following:
+
+Topic: ${topic}
+Category: ${category}
+Tone: ${tone}${context ? `\nAdditional context: ${context}` : ""}
+
+Output only the prompt itself.`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:streamGenerateContent?alt=sse&key=${apiKey}`;
+
+  const geminiRes = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemInstruction }] },
+      contents: [{ role: "user", parts: [{ text: userMessage }] }],
+      generationConfig: { maxOutputTokens: 1000 },
+    }),
+  });
+
+  if (!geminiRes.ok || !geminiRes.body) {
+    const err = await geminiRes.text();
+    return new Response(err, { status: geminiRes.status });
+  }
+
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = geminiRes.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6).trim();
+          if (data === "[DONE]") continue;
+          try {
+            const parsed = JSON.parse(data);
+            const text = parsed?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) controller.enqueue(encoder.encode(`0:${JSON.stringify(text)}\n`));
+          } catch { /* skip */ }
+        }
+      }
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "X-Vercel-AI-Data-Stream": "v1",
+    },
+  });
+}
