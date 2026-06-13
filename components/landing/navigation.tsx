@@ -11,6 +11,7 @@ const navLinks = [
   { name: "Achievements",  href: "#achievements"  },
   { name: "Verify",        href: "#verify"        },
   { name: "Pricing",       href: "#pricing"       },
+  { name: "Try AI Chat",   href: "/chat",         isExternal: true },
 ];
 
 export function Navigation() {
@@ -54,14 +55,14 @@ export function Navigation() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-12">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
-                className={`text-sm transition-colors duration-300 relative group ${isScrolled ? "text-foreground/70 hover:text-foreground" : "text-white/70 hover:text-white"}`}
+                className={`text-sm transition-colors duration-300 relative group ${link.name === "Try AI Chat" ? (isScrolled ? "text-foreground font-semibold" : "text-white font-semibold") : (isScrolled ? "text-foreground/70 hover:text-foreground" : "text-white/70 hover:text-white")}`}
               >
                 {link.name}
                 <span className={`absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full ${isScrolled ? "bg-foreground" : "bg-white"}`} />
-              </a>
+              </Link>
             ))}
           </div>
 
@@ -108,11 +109,11 @@ export function Navigation() {
           {/* Navigation Links */}
           <div className="flex-1 flex flex-col justify-center gap-8">
             {navLinks.map((link, i) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-5xl font-display text-foreground hover:text-muted-foreground transition-all duration-500 ${
+                className={`text-5xl font-display transition-all duration-500 ${link.name === "Try AI Chat" ? "text-foreground font-display" : "text-foreground hover:text-muted-foreground"} ${
                   isMobileMenuOpen 
                     ? "opacity-100 translate-y-0" 
                     : "opacity-0 translate-y-4"
@@ -120,7 +121,7 @@ export function Navigation() {
                 style={{ transitionDelay: isMobileMenuOpen ? `${i * 75}ms` : "0ms" }}
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
           </div>
           

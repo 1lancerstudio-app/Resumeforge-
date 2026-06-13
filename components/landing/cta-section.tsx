@@ -78,6 +78,14 @@ export function CtaSection() {
                     className="h-14 px-8 text-base rounded-full border-foreground/20 hover:bg-foreground/5"
                     asChild
                   >
+                    <Link href="/chat">Try AI Chat</Link>
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="h-14 px-8 text-base rounded-full border-foreground/20 hover:bg-foreground/5"
+                    asChild
+                  >
                     <Link href="/signup?role=recruiter">Verify a Resume</Link>
                   </Button>
                 </div>
