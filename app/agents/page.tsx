@@ -190,14 +190,17 @@ export default function AgentsPage() {
             )
           );
         }
-      } catch {
+      } catch (err) {
+        const errorMsg =
+          err instanceof Error && err.message.includes("API key")
+            ? err.message
+            : `Sorry, something went wrong. The agent API key may not be configured. Please check your environment variables.`;
         setMessages((prev) =>
           prev.map((m, i) =>
             i === prev.length - 1
               ? {
                   ...m,
-                  content:
-                    "Sorry, something went wrong. Please check your ANTHROPIC_API_KEY and try again.",
+                  content: errorMsg,
                   streaming: false,
                 }
               : m
