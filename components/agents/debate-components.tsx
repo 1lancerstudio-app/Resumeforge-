@@ -8,19 +8,33 @@ interface AgentMessageProps {
 
 export function AgentMessage({ agentId, content, isStreaming }: AgentMessageProps) {
   const agent = AGENTS[agentId]
+  
+  // Extract first sentence of system prompt for tooltip
+  const getExpertiseDescription = (systemPrompt: string): string => {
+    const match = systemPrompt.match(/You are.*?\./);
+    return match ? match[0] : agent.title;
+  }
+  
+  const tooltipText = getExpertiseDescription(agent.systemPrompt)
 
   return (
-    <div className="flex gap-3 mb-4 animate-fade-in">
-      {/* Agent avatar */}
+    <div className="flex gap-3 mb-4 animate-fade-in group">
+      {/* Agent avatar with tooltip */}
       <div
-        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono flex-shrink-0 border"
+        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-mono flex-shrink-0 border cursor-help relative"
         style={{
           background: agent.glowColor,
           borderColor: `${agent.color}60`,
           color: agent.color
         }}
+        title={tooltipText}
       >
         {agent.avatar}
+        {/* Tooltip on hover */}
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 hidden group-hover:block">
+          {tooltipText}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+        </div>
       </div>
 
       {/* Message content */}

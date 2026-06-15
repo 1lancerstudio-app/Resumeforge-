@@ -60,7 +60,8 @@ ${jobDescription}
 ${previousMessages.length > 0 ? `PREVIOUS DEBATE:\n${previousMessages.map((m) => `${m.agent}: ${m.content}`).join('\n\n')}` : ''}
 
 Round ${round} of 3 — respond as your character. Be specific to this candidate's actual data.
-Remember: Your messages should be under 80 words.`
+In Round 2+, reference and respond to what other agents said in previous rounds.
+Build on their arguments or push back with your own analysis.`
 
     // Fire all 6 agents in parallel
     const responses = await Promise.all(
@@ -78,13 +79,20 @@ Remember: Your messages should be under 80 words.`
 
         try {
           const client = createGroqClient(apiKey)
+          
+          // Adjust token limits based on agent and round
+          let maxTokens = 400
+          if (agentId === 'prometheus' && round === 3) {
+            maxTokens = 800  // Prometheus needs space for full probability JSON output in Round 3
+          }
+          
           const completion = await client.chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: [
               { role: 'system', content: agent.systemPrompt },
               { role: 'user', content: debateContextPrompt }
             ],
-            max_tokens: 250,
+            max_tokens: maxTokens,
             temperature: 0.8,
           })
 
