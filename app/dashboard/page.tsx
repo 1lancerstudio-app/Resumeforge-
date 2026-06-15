@@ -13,6 +13,7 @@ import type { ExternalLink } from "@/lib/external-platforms";
 
 const navLinks = [
   { name: "My Resumes", href: "/dashboard" },
+  { name: "Build Resume", href: "/resume-builder" },
   { name: "AI Agents", href: "/agents" },
   { name: "Achievements", href: "/dashboard#achievements" },
   { name: "Verify", href: "/dashboard#verify" },
@@ -99,7 +100,7 @@ export default function DashboardPage() {
             <p className="font-mono text-sm text-muted-foreground mb-10">
               You have 0 resumes built. Let&apos;s change that.
             </p>
-            <Link href="/agents">
+            <Link href="/resume-builder">
               <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-8 h-12 text-sm gap-2">
                 <Plus className="w-4 h-4" />
                 Build My First Resume
