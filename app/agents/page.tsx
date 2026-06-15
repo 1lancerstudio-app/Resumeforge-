@@ -4,46 +4,25 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Send, X, Plus, ArrowUp } from "lucide-react";
 import { DashboardNav } from "@/components/auth/dashboard-nav";
 
+import { AGENTS } from "@/lib/agents/agent-config"
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-type AgentId =
-  | "HR Agent"
-  | "Tailoring Agent"
-  | "Achievement Agent"
-  | "Tone Agent"
-  | "ATS Optimizer"
-  | "Verification Agent";
-
-interface Agent {
-  id: AgentId;
-  subtitle: string;
-  accent: string;
-}
+type AgentId = "zeus" | "athena" | "hermes" | "apollo" | "hephaestus" | "prometheus"
 
 interface Message {
-  role: "user" | "assistant";
-  content: string;
-  agent?: AgentId;
-  streaming?: boolean;
+  role: "user" | "assistant"
+  content: string
+  agentId?: AgentId
+  streaming?: boolean
 }
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
-const AGENTS: Agent[] = [
-  { id: "HR Agent",           subtitle: "Reads job descriptions",  accent: "#4ade80" },
-  { id: "Tailoring Agent",    subtitle: "Rewrites your bullets",   accent: "#eca8d6" },
-  { id: "Achievement Agent",  subtitle: "Mines your history",      accent: "#a78bfa" },
-  { id: "Tone Agent",         subtitle: "Matches company voice",   accent: "#67e8f9" },
-  { id: "ATS Optimizer",      subtitle: "Beats the filters",       accent: "#fbbf24" },
-  { id: "Verification Agent", subtitle: "Proves every claim",      accent: "#f87171" },
-];
 
 const SUGGESTIONS = [
   "Tailor my resume for a frontend role",
   "What keywords am I missing?",
   "Write a strong summary for me",
   "How do I pass ATS filters?",
-];
+]
 
 const NAV_LINKS = [
   { name: "My Resumes", href: "/dashboard" },
@@ -72,27 +51,24 @@ function TypingDots() {
 
 // ─── Message bubble ──────────────────────────────────────────────────────────
 
-function MessageBubble({ message, agent }: { message: Message; agent: Agent }) {
-  const isUser = message.role === "user";
+function MessageBubble({ message, agentId }: { message: Message; agentId: AgentId }) {
+  const isUser = message.role === "user"
+  const agent = AGENTS[agentId]
 
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"} gap-3`}>
       {!isUser && (
         <div
           className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-mono font-bold text-background shrink-0 mt-1"
-          style={{ background: agent.accent }}
+          style={{ background: agent.color }}
         >
-          {agent.id
-            .split(" ")
-            .map((w) => w[0])
-            .join("")
-            .slice(0, 2)}
+          {agent.avatar}
         </div>
       )}
       <div className={`flex flex-col ${isUser ? "items-end" : "items-start"} max-w-[75%]`}>
         {!isUser && (
           <span className="font-mono text-[10px] text-muted-foreground mb-1 uppercase tracking-widest">
-            {message.agent || agent.id}
+            {agent.name}
           </span>
         )}
         <div
@@ -112,7 +88,7 @@ function MessageBubble({ message, agent }: { message: Message; agent: Agent }) {
 // ─── Main page ───────────────────────────────────────────────────────────────
 
 export default function AgentsPage() {
-  const [activeAgentId, setActiveAgentId] = useState<AgentId>("HR Agent");
+  const [activeAgentId, setActiveAgentId] = useState<AgentId>("zeus");
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
@@ -124,7 +100,7 @@ export default function AgentsPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const activeAgent = AGENTS.find((a) => a.id === activeAgentId) || AGENTS[0];
+  const activeAgent = AGENTS[activeAgentId];
 
   // Load user
   useEffect(() => {
@@ -268,12 +244,12 @@ export default function AgentsPage() {
           </div>
 
           <div className="flex flex-col px-3 gap-1">
-            {AGENTS.map((agent) => {
-              const isActive = agent.id === activeAgentId;
+            {(Object.entries(AGENTS) as [AgentId, typeof AGENTS[AgentId]][]).map(([id, agent]) => {
+              const isActive = id === activeAgentId;
               return (
                 <button
-                  key={agent.id}
-                  onClick={() => setActiveAgentId(agent.id)}
+                  key={id}
+                  onClick={() => setActiveAgentId(id)}
                   className={`flex items-center gap-3 px-3 py-3 text-left transition-all duration-200 rounded-sm ${
                     isActive
                       ? "bg-secondary"
@@ -282,21 +258,21 @@ export default function AgentsPage() {
                   style={
                     isActive
                       ? {
-                          boxShadow: `inset 0 0 0 1px ${agent.accent}40`,
+                          boxShadow: `inset 0 0 0 1px ${agent.color}40`,
                         }
                       : {}
                   }
                 >
                   <span
                     className="w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{ background: agent.accent }}
+                    style={{ background: agent.color }}
                   />
                   <div className="flex flex-col min-w-0">
                     <span className="font-sans text-sm text-foreground truncate">
-                      {agent.id}
+                      {agent.name}
                     </span>
                     <span className="font-mono text-[10px] text-muted-foreground truncate">
-                      {agent.subtitle}
+                      {agent.title}
                     </span>
                   </div>
                 </button>
@@ -350,8 +326,8 @@ export default function AgentsPage() {
 
         {/* ── Mobile agent chips ── */}
         <div className="md:hidden absolute top-14 left-0 right-0 z-10 flex gap-2 overflow-x-auto px-4 py-2 bg-background border-b border-border scrollbar-hide">
-          {AGENTS.map((agent) => {
-            const isActive = agent.id === activeAgentId;
+          {(Object.entries(AGENTS) as [AgentId, typeof AGENTS[AgentId]][]).map(([id, agent]) => {
+            const isActive = id === activeAgentId;
             return (
               <button
                 key={agent.id}
@@ -364,9 +340,9 @@ export default function AgentsPage() {
               >
                 <span
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ background: agent.accent }}
+                  style={{ background: agent.color }}
                 />
-                {agent.id}
+                {agent.name}
               </button>
             );
           })}
@@ -382,10 +358,10 @@ export default function AgentsPage() {
                 style={{ background: activeAgent.accent }}
               />
               <span className="font-display text-lg text-foreground">
-                {activeAgent.id}
+                {activeAgent.name}
               </span>
               <span className="font-mono text-xs text-muted-foreground hidden sm:block">
-                {activeAgent.subtitle}
+                {activeAgent.title}
               </span>
             </div>
             <button
@@ -432,7 +408,7 @@ export default function AgentsPage() {
               </div>
             ) : (
               messages.map((msg, i) => (
-                <MessageBubble key={i} message={msg} agent={activeAgent} />
+                <MessageBubble key={i} message={msg} agentId={msg.agentId || activeAgentId} />
               ))
             )}
             <div ref={messagesEndRef} />

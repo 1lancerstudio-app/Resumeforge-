@@ -11,7 +11,7 @@ const navLinks = [
   { name: "Achievements",  href: "#achievements"  },
   { name: "Verify",        href: "#verify"        },
   { name: "Pricing",       href: "#pricing"       },
-  { name: "Try AI Chat",   href: "/chat",         isExternal: true },
+  { name: "Try AI Chat",   href: "/agents",         isExternal: true },
 ];
 
 export function Navigation({ isChat = false }) {

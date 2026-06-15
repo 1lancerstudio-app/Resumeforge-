@@ -123,7 +123,7 @@ export function AiChatDemoSection() {
                   className="bg-foreground hover:bg-foreground/90 text-background px-8 h-14 text-base rounded-full group"
                   asChild
                 >
-                  <Link href="/chat">
+                  <Link href="/agents">
                     Try AI Chat Now
                     <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                   </Link>
@@ -148,7 +148,7 @@ export function AiChatDemoSection() {
                         className="border-foreground/20 rounded-full"
                         asChild
                       >
-                        <Link href="/chat">Explore Chat</Link>
+                        <Link href="/agents">Explore Chat</Link>
                       </Button>
                     </div>
                   </div>
@@ -173,7 +173,7 @@ export function AiChatDemoSection() {
               className="bg-foreground hover:bg-foreground/90 text-background px-8 h-14 text-base rounded-full"
               asChild
             >
-              <Link href="/chat">Start Chatting</Link>
+              <Link href="/agents">Start Chatting</Link>
             </Button>
             <Button
               size="lg"
