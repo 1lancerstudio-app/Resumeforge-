@@ -12,19 +12,57 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // Read stored role and redirect
-    const role =
-      typeof window !== "undefined"
-        ? localStorage.getItem("resumeforge_role")
-        : null;
-    if (role === "recruiter") {
-      router.push("/recruiter");
-    } else {
-      router.push("/dashboard");
-    }
+    setError("");
+    setIsLoading(true);
+
+    // Simulate authentication delay
+    setTimeout(() => {
+      // Validate email and password
+      if (!email || !password) {
+        setError("Email and password are required");
+        setIsLoading(false);
+        return;
+      }
+
+      if (password.length < 6) {
+        setError("Password must be at least 6 characters");
+        setIsLoading(false);
+        return;
+      }
+
+      // Store authentication data in localStorage
+      const user = {
+        email: email,
+        name: email.split("@")[0],
+        createdAt: new Date().toISOString(),
+      };
+
+      localStorage.setItem("resumeforge_user", JSON.stringify(user));
+      
+      // Determine role from email or default to candidate
+      const role = email.includes("recruiter") ? "recruiter" : "candidate";
+      localStorage.setItem("resumeforge_role", role);
+      localStorage.setItem("resumeforge_auth_token", `token_${Date.now()}`);
+
+      // Mark user as new if first time
+      if (!localStorage.getItem("resumeforge_questionnaire_completed")) {
+        localStorage.setItem("resumeforge_new_user", "true");
+      }
+
+      setIsLoading(false);
+
+      // Redirect based on role
+      if (role === "recruiter") {
+        router.push("/recruiter");
+      } else {
+        router.push("/dashboard");
+      }
+    }, 500);
   }
 
   return (
@@ -48,6 +86,12 @@ export default function LoginPage() {
             Sign in to continue building.
           </p>
 
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/30 rounded-sm px-4 py-3 mb-6">
+              <p className="text-sm text-destructive">{error}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
@@ -60,6 +104,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className="bg-input border border-border rounded-sm px-4 py-3 font-sans text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/30"
+                disabled={isLoading}
               />
             </div>
 
@@ -75,11 +120,13 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-input border border-border rounded-sm px-4 py-3 pr-12 font-sans text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/30"
+                  disabled={isLoading}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <EyeOff className="w-4 h-4" />
@@ -92,11 +139,16 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-full h-12 text-sm font-sans mt-2"
+              className="w-full bg-foreground text-background hover:bg-foreground/90 rounded-full h-12 text-sm font-sans mt-2 disabled:opacity-50"
+              disabled={isLoading}
             >
-              Sign In
+              {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
+
+          <p className="text-xs text-muted-foreground text-center mt-4">
+            Demo tip: Use any email to test. Include "recruiter" in email to sign in as recruiter.
+          </p>
 
           {/* Divider */}
           <div className="flex items-center gap-4 my-6">
@@ -109,6 +161,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             className="w-full rounded-full h-12 text-sm border-border hover:bg-secondary gap-3"
+            disabled={isLoading}
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4" aria-hidden="true">
               <path
