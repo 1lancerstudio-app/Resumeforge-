@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { AGENTS, getAllAgents, type AgentId } from '@/lib/agents/agent-config'
 import { AgentMessage, ProbabilityCard } from '@/components/agents/debate-components'
+import { TonyPanel } from '@/components/debate/tony-panel'
+import { StevePanel } from '@/components/debate/steve-panel'
 import { Zap, Send } from 'lucide-react'
 
 interface DebateMessage {
@@ -13,7 +15,7 @@ interface DebateMessage {
   round: 1 | 2 | 3
 }
 
-type DebateState = 'idle' | 'round1' | 'round2' | 'round3' | 'assembling' | 'complete'
+type DebateState = 'idle' | 'round1' | 'round2' | 'round3' | 'tony' | 'steve' | 'complete'
 
 export default function ResumeBuilderPage() {
   const [debateState, setDebateState] = useState<DebateState>('idle')
@@ -23,6 +25,8 @@ export default function ResumeBuilderPage() {
   const [jobDescription, setJobDescription] = useState('')
   const [userInput, setUserInput] = useState('')
   const [probability, setProbability] = useState<any>(null)
+  const [resumeData, setResumeData] = useState<any>(null)
+  const [approvedAtsScore, setApprovedAtsScore] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Sample candidate profile - in real app this would come from user's connected platforms
@@ -119,7 +123,7 @@ export default function ResumeBuilderPage() {
       }
     }
 
-    setDebateState('complete')
+    setDebateState('tony')
   }
 
   const handleSendMessage = async () => {
@@ -186,7 +190,9 @@ export default function ResumeBuilderPage() {
               {debateState === 'round1' && 'ROUND 1: PROFILE ASSESSMENT'}
               {debateState === 'round2' && 'ROUND 2: STRATEGY DEBATE'}
               {debateState === 'round3' && 'ROUND 3: CONSENSUS & GENERATION'}
-              {debateState === 'complete' && 'DEBATE COMPLETE'}
+              {debateState === 'tony' && 'TONY: ENFORCEMENT PHASE'}
+              {debateState === 'steve' && 'STEVE: PDF GENERATION'}
+              {debateState === 'complete' && 'COMPLETE'}
             </>
           )}
         </div>
@@ -318,6 +324,31 @@ export default function ResumeBuilderPage() {
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
+
+                {/* Tony Panel - after Round 3 */}
+                <TonyPanel
+                  isVisible={debateState === 'tony'}
+                  resumeData={resumeData}
+                  candidateProfile={candidateProfile}
+                  jobDescription={jobDescription}
+                  targetRole={targetRole}
+                  allDebateMessages={messages}
+                  onApproved={(resume, atsScore) => {
+                    setResumeData(resume)
+                    setApprovedAtsScore(atsScore)
+                    setDebateState('steve')
+                  }}
+                />
+
+                {/* Steve Panel - after Tony approval */}
+                <StevePanel
+                  isVisible={debateState === 'steve'}
+                  approvedResume={resumeData}
+                  chosenTemplate="White Modern Business"
+                  onPdfGenerated={() => {
+                    setDebateState('complete')
+                  }}
+                />
               </>
             )}
           </div>
